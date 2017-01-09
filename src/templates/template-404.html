@@ -1,0 +1,24 @@
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="template-404">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+        <h1>404</h1>
+    </template>
+    <script>
+        Polymer({
+            is: 'template-404',
+            init: function(){
+                this.fire('update-head', {
+                    title: '404 Page not found',
+                    description: '404 Page not found'
+                });
+                this.fire('ready',{});
+            }
+        });
+    </script>
+</dom-module>

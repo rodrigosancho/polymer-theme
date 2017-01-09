@@ -1,0 +1,75 @@
+<link rel="import" href="../shared/echo-html.html">
+
+<link rel="import" href="../core/polymer-theme-service.html">
+<link rel="import" href="../core/polymer-theme-variable.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="template-blog-detail">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+        </style>
+
+        <polymer-theme-variable id="slug"
+                                key="slug"></polymer-theme-variable>
+
+        <polymer-theme-service id="service"
+                               on-post-received="_onPostReceived"
+                               loading="{{ loading }}">
+        </polymer-theme-service>
+
+        <div class="card">
+            <template is="dom-if"
+                      if="{{ post.thumbnail }}">
+                <div class="image">
+                    <img src$="[[ post.thumbnail ]]" alt="[[ post.title.rendered ]]">
+                </div>
+            </template>
+            <div class="content">
+                <h1>[[ post.title.rendered ]]</h1>
+                <echo-html html="[[ post.content.rendered ]]"></echo-html>
+            </div>
+        </div>
+
+    </template>
+    <script>
+        Polymer({
+            is: 'template-blog-detail',
+            properties: {
+                loading: {
+                    type: Boolean,
+                    reflectToAttribute: true
+                },
+                post: {
+                    type: Object,
+                    value: {}
+                }
+            },
+
+            init: function(){
+                this.$.service.getPostBySlug(this.$.slug.value);
+            },
+
+            _onPostReceived: function(){
+                if(event.detail.response.length === 0){
+                    this.fire('error', {
+                        response : event.detail.response
+                    })
+                }else{
+                    this.set('post', event.detail.response[0]);
+                    //Notifying to the shell the new head's info
+                    this.fire('update-head', this.post.seo);
+                    //Since every single blog entrance share this template,
+                    //we want to reset the scroll bar instead of share between the entrances
+                    this.fire('move-scroll', {
+                        x : 0,
+                        y : 0
+                    });
+                    this.fire('ready',{});
+                }
+            }
+        });
+    </script>
+</dom-module>

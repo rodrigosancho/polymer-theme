@@ -1,0 +1,18 @@
+{
+  "entrypoint": "index.php",
+  "shell": "src/polymer-theme-shell.html",
+  "fragments": [
+    "src/template/*",
+    "src/shared/*",
+    "src/polymer-theme-shell.html"
+  ],
+  "sourceGlobs": [
+   "src/**/*",
+   "images/**/*",
+   "bower.json"
+  ],
+  "includeDependencies": [
+    "manifest.json",
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js"
+  ]
+}

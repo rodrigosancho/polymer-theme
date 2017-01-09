@@ -1,0 +1,83 @@
+
+<dom-module id="polymer-theme-variable">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+        
+    </template>
+    <script>
+        (function(){
+            //Shared information: 
+            // data =  key:{ value:"", subscribers:[] } }
+            //Each key has a record of the elements which are subscribed to its value
+            var data = {}
+
+            Polymer({
+                is: 'polymer-theme-variable',
+                properties: {
+                    key: {
+                        type: String,
+                        reflectToAttribute: true,
+                        observer: 'subscribe'
+
+                    },
+                    value: {
+                        notify: true,
+                        reflectToAttribute: true
+                    }
+                },
+
+                observers: [
+                    '_updateOrigin(key, value)'
+                ],
+                
+                detached: function() {
+                    if (this.isSubscribed(this.key)) this.unsubscribe(this.key);
+                },
+
+                _set: function(key, value){
+                    this.set(key, value);
+                },
+
+                _updateOrigin: function(key, value){
+                    if(data[key].value != value) {
+                        data[key].value = value;
+                        //Propagating changes
+                        data[key].subscribers.forEach(function(element){
+                            element._set('value', value);
+                        });
+                    }
+                },
+
+                isSubscribed: function(){
+                    return this.key != '' && data[this.key].subscriber.indexOf(this) != -1; 
+                },
+
+                subscribe: function(newKey, oldKey){
+                    if(newKey != oldKey && oldKey) this.unsubscribe(oldKey);
+
+                    if(data[newKey]) {
+                        data[newKey].subscribers.push(this);
+                        if(this.value != data[newKey].value) 
+                            this.set('value', data[newKey].value);
+                    } else {
+                        data[newKey] = {
+                            value: this.value,
+                            subscribers: [this]
+                        };
+                    }
+                },
+
+                unsubscribe: function(key){
+                    var subscribers = data[key].subscribers;
+                    var index = subscribers.indexOf(this);
+                    if(index >= 0) subscribers.splice(index, 1);
+                    if(subscribers.length == 0) delete data[key];   
+                }
+            });
+        })()
+    </script>
+</dom-module>

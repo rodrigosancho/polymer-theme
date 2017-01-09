@@ -1,0 +1,309 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/app-layout/app-scrollpos-control/app-scrollpos-control.html">
+
+<link rel="import" href="../shared/polymer-theme-icons.html">
+<link rel="import" href="polymer-theme-variable.html">
+
+<dom-module id="polymer-theme-shell">
+    <template>
+        <style>
+            :host {
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
+                display: block;
+            }
+
+            :host iron-pages > * {
+                -webkit-transition: opacity 0.2s ease-in-out;
+                -moz-transition: opacity 0.2s ease-in-out;
+                -o-transition: opacity 0.2s ease-in-out;
+                transition: opacity 0.2s ease-in-out;
+            }
+
+            :host iron-pages > *[loading] {
+                opacity: 0;
+            }
+
+            :host iron-pages > * {
+                opacity: 1;
+            }
+
+            app-header {
+                color: #fff;
+                background-color: var(--app-primary-color);
+            }
+
+            app-header paper-icon-button {
+                --paper-icon-button-ink-color: white;
+            }
+
+            .drawer-list {
+                margin: 0 20px;
+            }
+
+            .drawer-list a {
+                display: block;
+                padding: 0 16px;
+                text-decoration: none;
+                color: var(--app-secondary-color);
+                line-height: 40px;
+            }
+
+            .drawer-list a.iron-selected {
+                color: black;
+                font-weight: bold;
+            }
+
+            paper-progress {
+                display: block;
+                width: 100%;
+                --paper-progress-active-color: rgba(255, 64, 129, 0.8);
+                --paper-progress-container-color: transparent;
+            }
+        </style>
+
+        <!-- Application Variables -->
+        <polymer-theme-variable key="offline" value="{{ offline }}"></polymer-theme-variable>
+        <polymer-theme-variable key="siteTitle" value="{{ siteTitle }}"></polymer-theme-variable>
+        <polymer-theme-variable key="frontPage" value="{{ frontPage }}"></polymer-theme-variable>
+        <polymer-theme-variable key="taxonomy" value="{{ taxonomy }}"></polymer-theme-variable>
+        <polymer-theme-variable key="slug" value="{{ slug }}"></polymer-theme-variable>
+
+
+        <app-location route="{{route}}"></app-location>
+        <app-route route="{{route}}" pattern="/:taxonomy/:slug" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+        <app-drawer-layout id="drawerLayout" fullbleed>
+            <!-- Drawer content -->
+            <app-drawer id="drawer"
+                        opened="{{ _menuOpened }}">
+                <app-toolbar>Menu</app-toolbar>
+                <iron-selector selected="[[page]]"
+                               attr-for-selected="name"
+                               class="drawer-list"
+                               role="navigation">
+                    <template is="dom-repeat" items="{{ menu('header-menu') }}">
+                        <a name$="[[ item.post_name ]]" href$="[[ item.url ]]">[[ item.title ]]</a>
+                    </template>
+                </iron-selector>
+            </app-drawer>
+
+            <!-- Main content -->
+            <app-header-layout>
+
+                <app-header id="header"
+                            condenses
+                            reveals
+                            effects="waterfall">
+                    <app-toolbar>
+                        <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+                        <div main-title>
+                            <a on-tap="_showHome">[[ siteTitle ]]</a>
+                        </div>
+                    </app-toolbar>
+                </app-header>
+
+                <iron-pages id="pages"
+                            selected="{{ template }}"
+                            attr-for-selected="id"
+                            role="main">
+                    <!-- Pages will be added on demand -->
+                </iron-pages>
+            </app-header-layout>
+        </app-drawer-layout>
+
+        <app-scrollpos-control id="scrollPos"
+                               selected="{{ template }}"></app-scrollpos-control>
+    </template>
+
+    <script>
+
+        // performance logging
+        window.performance && performance.mark && performance.mark('polymer-theme - before register');
+
+        Polymer({
+            is: 'polymer-theme-shell',
+
+            properties: {
+                taxonomy: {
+                    type: String,
+                    reflectToAttribute: true
+                },
+                slug: {
+                    type: String,
+                    reflectToAttribute: true
+                },
+                template: {
+                    type: String,
+                    reflectToAttribute: true
+                },
+                menus: {
+                    type: Object,
+                    value: {}
+                },
+                menu: {
+                    type: Function,
+                    computed: '_getMenu(menus)'
+                }
+            },
+
+            observers: [
+                '_routePageChanged(routeData)'
+            ],
+
+            listeners: {
+                'update-head': '_onUpdateHead',
+                'move-scroll': '_onMoveScroll'
+            },
+
+            created: function() {
+                window.performance && performance.mark && performance.mark('polymer-theme.created');
+                // Custom elements polyfill safe way to indicate an element has been upgraded.
+                this.removeAttribute('unresolved');
+            },
+
+            ready: function () {
+                // listen for online/offline
+                Polymer.RenderStatus.afterNextRender(this, function () {
+                    this.listen(window, 'online', '_updateNetworkStatus');
+                    this.listen(window, 'offline', '_updateNetworkStatus');
+                });
+            },
+
+            _updateNetworkStatus: function () {
+                this.offline = !navigator.onLine;
+            },
+
+            _routePageChanged: function (dataRoute) {
+                var taxonomy = dataRoute.taxonomy,
+                        slug = dataRoute.slug;
+
+                if (typeof taxonomy != 'undefined' && typeof slug != 'undefined') {
+                    if (taxonomy != '' && slug != '') {
+                        this._changePage(taxonomy, slug);
+                    } else if (taxonomy != '' && slug == '') {
+                        this._changePage('page', taxonomy);
+                    } else {
+                        this._showHome();
+                    }
+                } else {
+                    this._showHome();
+                }
+            },
+
+            _changePage: function (taxonomy, slug) {
+
+                this.taxonomy = taxonomy;
+                this.slug = slug;
+
+                var template;
+                // Load page import on demand. Show 404 page if fails
+                var resolvedCustomTemplateUrl = this.resolveUrl('templates/template-' + slug + '.html');
+                var resolvedRegularTemplateUrl = this.resolveUrl('templates/template-' + taxonomy + '-detail.html');
+                // First of all, try to load any possible custom template
+                this.importHref(resolvedCustomTemplateUrl,
+                        function () {
+                            this._setView(slug);
+                        },
+                        function () {
+                            // If a custom template does not exist, load the taxonomy regular template
+                            this.importHref(resolvedRegularTemplateUrl,
+                                    function () {
+                                        this._setView(taxonomy + '-detail');
+                                    },
+                                    this._showPage404, true);
+                        }, true);
+            },
+
+            _setView: function (template) {
+                var _onReady = function(){
+                    //Closing lateral menu
+                    this._closeMenu();
+                    view.removeEventListener('ready', _onReady);
+                    this.template = template;
+                }.bind(this);
+
+                var view = this.$.pages.querySelector('template-' + template);
+
+                //Adding template if necesary
+                if(!view){
+                    view = document.createElement('template-' + template);
+                    view.setAttribute('id', template);
+                    this.$.pages.appendChild(view);
+                }
+
+                view.addEventListener('ready', _onReady);
+
+                view.init();
+            },
+
+            _onUpdateHead: function (event) {
+                var metas = event.detail;
+
+                try{
+                    document.title = metas.title;
+                    document.querySelectorAll('meta').forEach(function (meta) {
+                        if (typeof metas[meta.name] != 'undefined')
+                            meta.content = metas[meta.name];
+                    });
+                }catch(err){
+                    console.error(err.message);
+                }
+            },
+
+            _onMoveScroll: function (event) {
+//                try{
+//                    this.$.scrollPos.scroll(event.detail.x, event.detail.y);
+//                }catch(err){
+//                    console.error(err.message);
+//                }
+                Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+            },
+
+            _showHome: function () {
+                if(this.frontPage)
+                    this._changePage('page', this.frontPage);
+                else
+                    this._showPage404();
+            },
+
+            _showPage404: function () {
+                this._changePage('page', '404');
+            },
+
+            _closeMenu: function () {
+                //Closing the menu only under mobile width
+                var responsiveWidth = +(this.$.drawerLayout.responsiveWidth.replace('px', ''));
+                this._menuOpened = !(responsiveWidth > window.innerWidth);
+
+            },
+
+            _getMenu: function (menus) {
+                return function (position) {
+                    return menus[position];
+                }
+            }
+        });
+    </script>
+</dom-module>
