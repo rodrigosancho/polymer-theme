@@ -108,7 +108,7 @@
     </script>
 
     <link rel="import" href="<?php echo get_template_directory_uri(); ?>/src/core/polymer-theme-shell.html">
-    <link rel="import" href="<?php echo get_template_directory_uri(); ?>/src/core/polymer-theme-variable.html">
+    <link rel="import" href="<?php echo get_template_directory_uri(); ?>/bower_components/global-variable/global-variable.html">
 
     <style>
         body {
@@ -132,12 +132,12 @@
 <!-- End Google Tag Manager (noscript) -->
 
 <!-- App Status variables -->
-<polymer-theme-variable key="siteUrl" value="<?php echo get_option('siteurl'); ?>"></polymer-theme-variable>
-<polymer-theme-variable key="siteDescription"
-                        value="<?php echo get_option('blogdescription'); ?>"></polymer-theme-variable>
-<polymer-theme-variable key="siteTitle" value="<?php echo get_option('blogname'); ?>"></polymer-theme-variable>
-<polymer-theme-variable key="frontPage" value="<?php echo get_front_page(); ?>"></polymer-theme-variable>
-<polymer-theme-variable key="postPerPage" value="<?php echo get_option('posts_per_page'); ?>"></polymer-theme-variable>
+<global-variable key="siteUrl" value="<?php echo get_option('siteurl'); ?>"></global-variable>
+<global-variable key="siteDescription"
+                        value="<?php echo get_option('blogdescription'); ?>"></global-variable>
+<global-variable key="siteTitle" value="<?php echo get_option('blogname'); ?>"></global-variable>
+<global-variable key="frontPage" value="<?php echo get_front_page(); ?>"></global-variable>
+<global-variable key="postPerPage" value="<?php echo get_option('posts_per_page'); ?>"></global-variable>
 
 <!-- App -->
 <polymer-theme-shell unresolved></polymer-theme-shell>

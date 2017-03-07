@@ -1,7 +1,9 @@
-<link rel="import" href="../shared/echo-html.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/global-variable/global-variable.html">
 
 <link rel="import" href="../core/polymer-theme-service.html">
-<link rel="import" href="../core/polymer-theme-variable.html">
+
+<link rel="import" href="../shared/echo-html.html">
 <link rel="import" href="../shared/shared-styles.html">
 
 <dom-module id="template-blog-detail">
@@ -12,8 +14,8 @@
             }
         </style>
 
-        <polymer-theme-variable id="slug"
-                                key="slug"></polymer-theme-variable>
+        <global-variable id="slug"
+                         key="slug"></global-variable>
 
         <polymer-theme-service id="service"
                                on-post-received="_onPostReceived"
@@ -48,26 +50,26 @@
                 }
             },
 
-            init: function(){
+            init: function () {
                 this.$.service.getPostBySlug(this.$.slug.value);
             },
 
-            _onPostReceived: function(){
-                if(event.detail.response.length === 0){
+            _onPostReceived: function () {
+                if (event.detail.response.length === 0) {
                     this.fire('error', {
-                        response : event.detail.response
+                        response: event.detail.response
                     })
-                }else{
+                } else {
                     this.set('post', event.detail.response[0]);
                     //Notifying to the shell the new head's info
                     this.fire('update-head', this.post.seo);
                     //Since every single blog entrance share this template,
                     //we want to reset the scroll bar instead of share between the entrances
                     this.fire('move-scroll', {
-                        x : 0,
-                        y : 0
+                        x: 0,
+                        y: 0
                     });
-                    this.fire('ready',{});
+                    this.fire('ready', {});
                 }
             }
         });

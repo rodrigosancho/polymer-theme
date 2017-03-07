@@ -1,19 +1,21 @@
-<link rel="import" href="../shared/echo-html.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/global-variable/global-variable.html">
 
 <link rel="import" href="../core/polymer-theme-service.html">
-<link rel="import" href="../core/polymer-theme-variable.html">
+
+<link rel="import" href="../shared/echo-html.html">
 <link rel="import" href="../shared/shared-styles.html">
 
 <dom-module id="template-page-detail">
     <template>
         <style include="shared-styles">
-            :host{
+            :host {
                 display: block;
             }
         </style>
 
-        <polymer-theme-variable id="slug"
-                                key="slug"></polymer-theme-variable>
+        <global-variable id="slug"
+                         key="slug"></global-variable>
 
         <polymer-theme-service id="service"
                                on-page-received="_onPageReceived"
@@ -66,10 +68,10 @@
                     //Since every single page share this template,
                     //we want to reset the scroll bar instead of share between the pages
                     this.fire('move-scroll', {
-                        x : 0,
-                        y : 0
+                        x: 0,
+                        y: 0
                     });
-                    this.fire('ready',{});
+                    this.fire('ready', {});
                 }
             }
         });

@@ -1,6 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-
-<link rel="import" href="polymer-theme-variable.html">
+<link rel="import" href="../../bower_components/global-variable/global-variable.html">
 
 <dom-module id="polymer-theme-service">
     <template>
@@ -9,11 +8,11 @@
                 display: none;
             }
         </style>
-        
+
         <!-- Application Variables -->
-        <polymer-theme-variable key="siteUrl" value="{{ siteUrl }}"></polymer-theme-variable>
-        <polymer-theme-variable key="offline" value="{{ offline }}"></polymer-theme-variable>
-        
+        <global-variable key="siteUrl" value="{{ siteUrl }}"></global-variable>
+        <global-variable key="offline" value="{{ offline }}"></global-variable>
+
     </template>
     <script>
         Polymer({
@@ -24,9 +23,9 @@
                     type: String,
                     value: '/wp-json/wp/v2/'
                 },
-                pageSize:{
+                pageSize: {
                     type: Number,
-                    value: 10,
+                    value: 10
                 },
                 loading: {
                     type: Boolean,
@@ -36,14 +35,14 @@
                 }
             },
 
-            _onLoading: function(loading){
+            _onLoading: function (loading) {
                 this.loading = loading;
                 /*this.fire('loading', {
-                    loading: loading
-                })*/
+                 loading: loading
+                 })*/
             },
 
-            _handleResponse: function(response, event){
+            _handleResponse: function (response, event) {
                 this.fire(event, {
                     response: response
                 });
@@ -51,7 +50,7 @@
                 this._onLoading(false);
             },
 
-            _handleError: function(response){
+            _handleError: function (response) {
                 this.fire('error', {
                     response: response
                 });
@@ -59,18 +58,18 @@
                 this._onLoading(false);
             },
 
-            _mountUrl : function(siteUrl, api, endPoint, params){
+            _mountUrl: function (siteUrl, api, endPoint, params) {
                 var url = new URL(siteUrl + api + endPoint);
                 //Handling params
-                if(params){
-                    Object.keys(params).forEach(function(key){
-                        if(key === 'filters'){
+                if (params) {
+                    Object.keys(params).forEach(function (key) {
+                        if (key === 'filters') {
                             //Handling filters
                             var filters = params[key];
-                            Object.keys(filters).forEach(function(filterKey){
-                                url.searchParams.append('filters['+ filterKey +']', filters[filterKey]);
+                            Object.keys(filters).forEach(function (filterKey) {
+                                url.searchParams.append('filters[' + filterKey + ']', filters[filterKey]);
                             });
-                        }else{
+                        } else {
                             url.searchParams.append(key, params[key]);
                         }
                     });
@@ -79,7 +78,7 @@
                 return url;
             },
 
-            _get: function(endPoint, event, params){
+            _get: function (endPoint, event, params) {
 
                 this._onLoading(true);
 
@@ -87,45 +86,45 @@
 
                 //Fetching the information
                 fetch(url)
-                .then(function(response){
-                    if(!response.ok) this._handleError(response);
-                    else {
-                        response.json()
-                        .then(function(json){
-                            this._handleResponse(json, event);
-                        }.bind(this));
-                    }
-                }.bind(this))
-                .catch(function(response){
-                    this._handleError(response);
-                }.bind(this))
-                
+                        .then(function (response) {
+                            if (!response.ok) this._handleError(response);
+                            else {
+                                response.json()
+                                        .then(function (json) {
+                                            this._handleResponse(json, event);
+                                        }.bind(this));
+                            }
+                        }.bind(this))
+                        .catch(function (response) {
+                            this._handleError(response);
+                        }.bind(this))
+
             },
 
-            getPosts: function(page){
+            getPosts: function (page) {
                 var params = {
-                    per_page : this.pageSize,
+                    per_page: this.pageSize,
                     page: page || 1
                 };
 
                 this._get('posts', 'posts-received', params);
             },
 
-            getPostByID: function(id){
+            getPostByID: function (id) {
                 this._get('posts/' + id, 'post-received');
             },
 
-            getPostBySlug: function(slug){
+            getPostBySlug: function (slug) {
                 var params = {
-                    slug : slug
+                    slug: slug
                 };
 
                 this._get('posts', 'post-received', params);
             },
 
-            getPages: function(){
+            getPages: function () {
                 var params = {
-                    filters : {
+                    filters: {
                         post_per_page: -1 //Return all the pages
                     }
                 };
@@ -133,13 +132,13 @@
                 this._get('pages', 'pages-received', params)
             },
 
-            getPageByID: function(id){
+            getPageByID: function (id) {
                 this._get('pages/' + id, 'page-received');
             },
 
-            getPageBySlug: function(slug){
+            getPageBySlug: function (slug) {
                 var params = {
-                    slug : slug
+                    slug: slug
                 };
 
                 this._get('pages', 'page-received', params);

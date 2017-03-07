@@ -1,31 +1,37 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="shared-styles.html">
+
 <dom-module id="echo-html">
-  <template>
-    <style>
-    :host {
-      display: block;
-    }
-  </style>
-  <!-- DOM Goes Here -->
-    <div id="content"></div>
-  </template>
-  <script>
-    Polymer({
-      is: 'echo-html',
-      properties: {
-        html: {
-          type: String,
-          observer: '_htmlChanged'
-        },
-        tag: {
-          type: String,
-          value: 'div'
-        }
-      },
-      _htmlChanged: function (html) {
-        // WARNING: potential XSS vulnerability if `html` comes from an untrusted source
-        this.$.content.innerHTML = html;
-      }
-    });
-</script>
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+
+        </style>
+        <!-- DOM Goes Here -->
+        <div id="content"></div>
+    </template>
+    <script>
+        Polymer({
+            is: 'echo-html',
+            properties: {
+                html: {
+                    type: String,
+                    observer: '_htmlChanged'
+                },
+                tag: {
+                    type: String,
+                    value: 'div'
+                }
+            },
+            _htmlChanged: function (html) {
+                // WARNING: potential XSS vulnerability if `html` comes from an untrusted source
+                this.$.content.innerHTML = html;
+            }
+        });
+    </script>
 </dom-module>
 

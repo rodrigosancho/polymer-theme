@@ -1,9 +1,11 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 
-<link rel="import" href="../shared/echo-html.html">
 
 <link rel="import" href="../core/polymer-theme-service.html">
+<link rel="import" href="../shared/echo-html.html">
 <link rel="import" href="../shared/polymer-theme-icons.html">
+
 <link rel="import" href="../shared/shared-styles.html">
 
 <dom-module id="template-blog">
@@ -14,9 +16,9 @@
                 padding: 10px;
             }
         </style>
-        
-        <polymer-theme-service id="service" 
-                               loading="{{ loading }}" 
+
+        <polymer-theme-service id="service"
+                               loading="{{ loading }}"
                                on-posts-received="_onPostsReceived"
                                on-page-received="_onPageReceived">
         </polymer-theme-service>
@@ -55,19 +57,19 @@
                 }
             },
 
-            init: function(){
+            init: function () {
                 //Fetching posts
                 this.$.service.getPageBySlug("blog");
                 //Fetching blog page information (seo)
                 this.$.service.getPosts();
             },
 
-            _onPostsReceived: function(event){
+            _onPostsReceived: function (event) {
                 this.set('posts', event.detail.response);
-                this.fire('ready',{});
+                this.fire('ready', {});
             },
 
-            _onPageReceived: function(event){
+            _onPageReceived: function (event) {
                 var page = event.detail.response[0];
                 this.fire('update-head', page.seo);
             }

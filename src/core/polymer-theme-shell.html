@@ -21,9 +21,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/app-layout/app-scrollpos-control/app-scrollpos-control.html">
+<link rel="import" href="../../bower_components/global-variable/global-variable.html">
 
 <link rel="import" href="../shared/polymer-theme-icons.html">
-<link rel="import" href="polymer-theme-variable.html">
 
 <dom-module id="polymer-theme-shell">
     <template>
@@ -84,11 +84,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
 
         <!-- Application Variables -->
-        <polymer-theme-variable key="offline" value="{{ offline }}"></polymer-theme-variable>
-        <polymer-theme-variable key="siteTitle" value="{{ siteTitle }}"></polymer-theme-variable>
-        <polymer-theme-variable key="frontPage" value="{{ frontPage }}"></polymer-theme-variable>
-        <polymer-theme-variable key="taxonomy" value="{{ taxonomy }}"></polymer-theme-variable>
-        <polymer-theme-variable key="slug" value="{{ slug }}"></polymer-theme-variable>
+        <global-variable key="offline" value="{{ offline }}"></global-variable>
+        <global-variable key="siteTitle" value="{{ siteTitle }}"></global-variable>
+        <global-variable key="frontPage" value="{{ frontPage }}"></global-variable>
+        <global-variable key="taxonomy" value="{{ taxonomy }}"></global-variable>
+        <global-variable key="slug" value="{{ slug }}"></global-variable>
 
 
         <app-location route="{{route}}"></app-location>
@@ -177,7 +177,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 'move-scroll': '_onMoveScroll'
             },
 
-            created: function() {
+            created: function () {
                 window.performance && performance.mark && performance.mark('polymer-theme.created');
                 // Custom elements polyfill safe way to indicate an element has been upgraded.
                 this.removeAttribute('unresolved');
@@ -219,8 +219,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 var template;
                 // Load page import on demand. Show 404 page if fails
-                var resolvedCustomTemplateUrl = this.resolveUrl('templates/template-' + slug + '.html');
-                var resolvedRegularTemplateUrl = this.resolveUrl('templates/template-' + taxonomy + '-detail.html');
+                var resolvedCustomTemplateUrl = this.resolveUrl('../templates/template-' + slug + '.html');
+                var resolvedRegularTemplateUrl = this.resolveUrl('../templates/template-' + taxonomy + '-detail.html');
                 // First of all, try to load any possible custom template
                 this.importHref(resolvedCustomTemplateUrl,
                         function () {
@@ -237,7 +237,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
 
             _setView: function (template) {
-                var _onReady = function(){
+                var _onReady = function () {
                     //Closing lateral menu
                     this._closeMenu();
                     view.removeEventListener('ready', _onReady);
@@ -247,7 +247,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var view = this.$.pages.querySelector('template-' + template);
 
                 //Adding template if necesary
-                if(!view){
+                if (!view) {
                     view = document.createElement('template-' + template);
                     view.setAttribute('id', template);
                     this.$.pages.appendChild(view);
@@ -261,13 +261,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _onUpdateHead: function (event) {
                 var metas = event.detail;
 
-                try{
+                try {
                     document.title = metas.title;
                     document.querySelectorAll('meta').forEach(function (meta) {
                         if (typeof metas[meta.name] != 'undefined')
                             meta.content = metas[meta.name];
                     });
-                }catch(err){
+                } catch (err) {
                     console.error(err.message);
                 }
             },
@@ -278,11 +278,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 //                }catch(err){
 //                    console.error(err.message);
 //                }
-                Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+                Polymer.AppLayout.scroll({top: 0, behavior: 'silent'});
             },
 
             _showHome: function () {
-                if(this.frontPage)
+                if (this.frontPage)
                     this._changePage('page', this.frontPage);
                 else
                     this._showPage404();
