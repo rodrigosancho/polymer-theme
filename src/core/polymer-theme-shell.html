@@ -89,10 +89,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="frontPage" value="{{ frontPage }}"></global-variable>
         <global-variable key="taxonomy" value="{{ taxonomy }}"></global-variable>
         <global-variable key="slug" value="{{ slug }}"></global-variable>
-
+        <global-variable key="alias" value="{{ alias }}"></global-variable>
 
         <app-location route="{{route}}"></app-location>
-        <app-route route="{{route}}" pattern="/:taxonomy/:slug" data="{{routeData}}" tail="{{subroute}}"></app-route>
+        <app-route route="{{route}}"
+                   pattern="/[[alias]]/:taxonomy/:slug"
+                   data="{{routeData}}"
+                   tail="{{subroute}}"></app-route>
 
         <app-drawer-layout id="drawerLayout" fullbleed>
             <!-- Drawer content -->

@@ -138,6 +138,7 @@
 <global-variable key="siteTitle" value="<?php echo get_option('blogname'); ?>"></global-variable>
 <global-variable key="frontPage" value="<?php echo get_front_page(); ?>"></global-variable>
 <global-variable key="postPerPage" value="<?php echo get_option('posts_per_page'); ?>"></global-variable>
+<global-variable key="alias" value=""></global-variable>
 
 <!-- App -->
 <polymer-theme-shell unresolved></polymer-theme-shell>
