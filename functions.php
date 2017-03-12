@@ -526,34 +526,66 @@ function slug_get_thumbnail($object, $field_name, $request)
     return wp_get_attachment_url($object['featured_media']);
 }
 
+//add_filter( 'theme_page_templates', 'adding_polymer_theme_templates' );
+//
+//function adding_polymer_theme_templates( $post_templates ) {
+//    if ( version_compare( $GLOBALS['wp_version'], '4.7', '<' ) ) {
+//        array_push($post_templates, 'templates/template-blog.html');
+//    }
+//    return $post_templates;
+//}
+
 
 // create custom plugin settings menu
 add_action('admin_menu', 'polymer_theme_create_admin');
+//call register settings function
+add_action('admin_init', 'register_polymer_theme_settings');
 
 function polymer_theme_create_admin()
 {
     //create new top-level menu
-    add_menu_page('polymer-theme', 'polymer-theme', 'administrator', __FILE__, 'polymer_theme_view', get_template_directory_uri() . '/images/polymer.svg');
-
-    //call register settings function
-    add_action( 'admin_init', 'register_polymer_theme_settings' );
+    add_menu_page(
+        'polymer-theme',
+        'polymer-theme',
+        'administrator',
+        'polymer-theme',
+        'create_polymer_theme_view',
+        get_template_directory_uri() . '/images/polymer.svg');
 }
 
 
 function register_polymer_theme_settings()
 {
-    //register our settings
-    register_setting('polymer-theme', 'settings');
-    register_setting('polymer-theme', 'templates');
+    //TODO register our settings
 }
 
-function polymer_theme_view() {
-    //TODO Recover options/settings
+function create_polymer_theme_view()
+{
+    //Recovering options
+    $options = get_option('polymer-theme_options');
+    //TODO Recover templates
+    $templates = [];
     ?>
-    <polymer-theme-admin options-name='polymer-theme'
-                         options='{}'
-                         templates='[]'></polymer-theme-admin>
+    <polymer-theme-admin url="<?= get_admin_url().'admin-ajax.php'; ?>"
+                         options-name='polymer-theme-options'
+                         options='<?= json_encode($options); ?>'
+                         nonce="<?= wp_create_nonce('polymer-theme-nonce'); ?>"
+                         action="update_polymer-theme_options"
+                         templates='<?= json_encode($templates); ?>'>
+    </polymer-theme-admin>
     <?php
+}
+
+add_action( 'wp_ajax_update_polymer-theme_options', 'post_love_add_love' );
+
+function post_love_add_love() {
+    $options = file_get_contents('php://input');
+    //Check secure param
+    if(wp_verify_nonce( $_REQUEST['_nonce'], 'polymer-theme-nonce') && isset($options)){
+        //Save info
+        update_option( 'polymer-theme_options', json_decode($options));
+    }
+    die();
 }
 
 

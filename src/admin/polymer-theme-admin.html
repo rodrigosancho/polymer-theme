@@ -7,7 +7,9 @@
 <link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../shared/shared-styles.html">
 
@@ -30,36 +32,51 @@
                 <paper-tabs selected="{{ view }}" sticky>
                     <paper-tab>General Settings</paper-tab>
                     <paper-tab>Templates</paper-tab>
+                    <paper-tab>Analytics</paper-tab>
                 </paper-tabs>
             </app-header>
 
-            <iron-pages selected="{{ view }}"
-                        fallback-selection="0">
-                <div>
-                    <!-- Settings -->
-                    <h2>General Settings</h2>
-                    <form is="iron-form"
-                          method="post"
-                          action="options.php">
-                        <paper-input label="Favicon"
-                                     name="[[ getName('settings', 'favicon') ]]"
-                                     value="{{ options.settings.favicon }}">
-                        </paper-input>
-                        <paper-input label="Base url"
-                                     name="[[ getName('settings', 'baseUrl') ]]"
-                                     value="{{ options.settings.baseUrl }}">
-                        </paper-input>
-                        <paper-input label="Theme color"
-                                     name="[[ getName('settings', 'themeColor') ]]"
-                                     value="{{ options.settings.themeColor }}">
-                        </paper-input>
-                    </form>
-                </div>
-                <div>
-                    <!-- Templates -->
-                    <h2>Templates</h2>
-                </div>
-            </iron-pages>
+            <iron-ajax id="ajax"
+                       method="post"
+                       url="[[ url ]]"
+                       content-type="application/json"
+                       params="[[ params ]]"
+                       body="[[ options ]]"></iron-ajax>
+
+                <iron-pages id="pages"
+                            selected="{{ view }}"
+                            fallback-selection="0">
+                    <div class="page">
+                        <!-- Settings -->
+                        <h2>General Settings</h2>
+                        <form id="form"
+                              is="iron-form">
+                            <paper-input label="Favicon"
+                                         required
+                                         name="[[ getName('settings', 'favicon') ]]"
+                                         value="{{ options.favicon }}">
+                            </paper-input>
+                            <paper-input label="Base url"
+                                         name="[[ getName('settings', 'baseUrl') ]]"
+                                         value="{{ options.baseUrl }}">
+                            </paper-input>
+                            <paper-input label="Theme color"
+                                         name="[[ getName('settings', 'themeColor') ]]"
+                                         value="{{ options.themeColor }}">
+                            </paper-input>
+                        </form>
+                    </div>
+                    <div class="page">
+                        <!-- Templates -->
+                        <h2>Templates</h2>
+                    </div>
+                    <div class="page">
+                        <!-- Analytics -->
+                        <h2>Analytics</h2>
+                    </div>
+                </iron-pages>
+
+            <paper-button on-click="_submit">Save</paper-button>
         </app-drawer-layout>
 
     </template>
@@ -68,20 +85,38 @@
             is: 'polymer-theme-admin',
             properties: {
                 language: 'en',
+                /** admin-ajax.php path */
+                url: String,
                 /** Name of the theme's options */
                 optionsName: String,
                 /** Options values */
                 options: Object,
                 getName: {
                     type: 'Function',
-                    computed : '_getName(optionsName)'
+                    computed: '_getName(optionsName)'
+                },
+                nonce: String,
+                action : String,
+                params: {
+                    type: Object,
+                    computed: '_mountParams(action, nonce)'
                 }
             },
-
-            _getName : function(optionsName){
+            _getName: function (optionsName) {
                 return function (section, variable) {
                     return optionsName + '[\'' + section + '\'][\'' + variable + '\']';
                 }
+            },
+
+            _mountParams: function (action, nonce){
+                return {
+                    action: action,
+                    _nonce: nonce
+               };
+            },
+
+            _submit: function () {
+                this.$.ajax.generateRequest();
             }
         });
     </script>

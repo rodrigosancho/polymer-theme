@@ -20,7 +20,8 @@
     "global-variable": "trofrigo/global-variable#^0.1.4",
     "paper-tabs": "^1.8.0",
     "paper-input": "^1.1.23",
-    "iron-form": "^1.1.4"
+    "iron-form": "^1.1.4",
+    "paper-button": "^1.0.14"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
