@@ -15,13 +15,11 @@
     Theme Support
 \*------------------------------------*/
 
-if (!isset($content_width))
-{
+if (!isset($content_width)) {
     $content_width = 900;
 }
 
-if (function_exists('add_theme_support'))
-{
+if (function_exists('add_theme_support')) {
 
     // Add Thumbnail Theme Support
     add_theme_support('post-thumbnails');
@@ -63,29 +61,32 @@ if (function_exists('add_theme_support'))
     Functions
 \*------------------------------------*/
 
-function get_menus(){
+function get_menus()
+{
 
-    $menusKeys = ['header-menu','sidebar-menu','extra-menu'];
+    $menusKeys = ['header-menu', 'sidebar-menu', 'extra-menu'];
     $menus = [];
 
     $locations = get_nav_menu_locations();
 
-    foreach($menusKeys as $key){
+    foreach ($menusKeys as $key) {
         $menus[$key] = wp_get_nav_menu_items($locations[$key]);
     }
 
     return json_encode($menus);
 }
 
-function get_all_pages(){
+function get_all_pages()
+{
     return json_encode(get_pages());
 }
 
-function get_front_page(){
-    $frontPageId = get_option( 'page_on_front' );
-    if($frontPageId > 0){
-        return get_post_field( 'post_name', $frontPageId );
-    }else{
+function get_front_page()
+{
+    $frontPageId = get_option('page_on_front');
+    if ($frontPageId > 0) {
+        return get_post_field('post_name', $frontPageId);
+    } else {
         return 'blog';
     }
 }
@@ -94,23 +95,23 @@ function get_front_page(){
 function polymer_theme_nav()
 {
     wp_nav_menu(
-    array(
-        'theme_location'  => 'header-menu',
-        'menu'            => '',
-        'container'       => 'div',
-        'container_class' => 'menu-{menu slug}-container',
-        'container_id'    => '',
-        'menu_class'      => 'menu',
-        'menu_id'         => '',
-        'echo'            => true,
-        'fallback_cb'     => 'wp_page_menu',
-        'before'          => '',
-        'after'           => '',
-        'link_before'     => '',
-        'link_after'      => '',
-        'items_wrap'      => '<ul>%3$s</ul>',
-        'depth'           => 0,
-        'walker'          => ''
+        array(
+            'theme_location' => 'header-menu',
+            'menu' => '',
+            'container' => 'div',
+            'container_class' => 'menu-{menu slug}-container',
+            'container_id' => '',
+            'menu_class' => 'menu',
+            'menu_id' => '',
+            'echo' => true,
+            'fallback_cb' => 'wp_page_menu',
+            'before' => '',
+            'after' => '',
+            'link_before' => '',
+            'link_after' => '',
+            'items_wrap' => '<ul>%3$s</ul>',
+            'depth' => 0,
+            'walker' => ''
         )
     );
 }
@@ -143,13 +144,22 @@ function polymer_theme_header_scripts()
             // Enqueue Scripts
             wp_enqueue_script('polymer_themescripts');
 
-        // If production
+            // If production
         } else {
             // Scripts minify
             wp_register_script('polymer_themescripts-min', get_template_directory_uri() . '/js/scripts.min.js', array(), '1.0.0');
             // Enqueue Scripts
             wp_enqueue_script('polymer_themescripts-min');
         }
+    } else {
+
+
+        //Adding Webcomponents polyfill
+        wp_register_script('webcomponents_polyfill', get_template_directory_uri() . '/bower_components/webcomponentsjs/webcomponents-lite.min.js', array());
+        wp_enqueue_script('webcomponents_polyfill');
+        //Adding polymer-theme-admin element
+        wp_register_style('import_html', get_template_directory_uri() . '/src/admin/polymer-theme-admin.html', array());
+        wp_enqueue_style('import_html');
     }
 }
 
@@ -193,6 +203,14 @@ function register_html5_menu()
     ));
 }
 
+//Replace the rel=stylesheet rel=import
+function import_html($html, $handle, $href)
+{
+    if ('import_html' === $handle)
+        $html = str_replace('stylesheet', 'import', $html);
+    return $html;
+}
+
 // Remove the <div> surrounding the dynamic navigation to cleanup markup
 function my_wp_nav_menu_args($args = '')
 {
@@ -231,15 +249,15 @@ function add_slug_to_body_class($classes)
 }
 
 // Remove the width and height attributes from inserted images
-function remove_width_attribute( $html ) {
-   $html = preg_replace( '/(width|height)="\d*"\s/', "", $html );
-   return $html;
+function remove_width_attribute($html)
+{
+    $html = preg_replace('/(width|height)="\d*"\s/', "", $html);
+    return $html;
 }
 
 
 // If Dynamic Sidebar Exists
-if (function_exists('register_sidebar'))
-{
+if (function_exists('register_sidebar')) {
     // Define Sidebar Widget Area 1
     register_sidebar(array(
         'name' => __('Widget Area 1', 'polymer_theme'),
@@ -335,14 +353,14 @@ function html5_style_remove($tag)
 }
 
 // Remove thumbnail width and height dimensions that prevent fluid images in the_thumbnail
-function remove_thumbnail_dimensions( $html )
+function remove_thumbnail_dimensions($html)
 {
     $html = preg_replace('/(width|height)=\"\d*\"\s/', "", $html);
     return $html;
 }
 
 // Custom Gravatar in Settings > Discussion
-function polymer_themegravatar ($avatar_defaults)
+function polymer_themegravatar($avatar_defaults)
 {
     $myavatar = get_template_directory_uri() . '/img/gravatar.jpg';
     $avatar_defaults[$myavatar] = "Custom Gravatar";
@@ -365,42 +383,43 @@ function polymer_themecomments($comment, $args, $depth)
     $GLOBALS['comment'] = $comment;
     extract($args, EXTR_SKIP);
 
-    if ( 'div' == $args['style'] ) {
+    if ('div' == $args['style']) {
         $tag = 'div';
         $add_below = 'comment';
     } else {
         $tag = 'li';
         $add_below = 'div-comment';
     }
-?>
+    ?>
     <!-- heads up: starting < for the html tag (li or div) in the next line: -->
-    <<?php echo $tag ?> <?php comment_class(empty( $args['has_children'] ) ? '' : 'parent') ?> id="comment-<?php comment_ID() ?>">
-    <?php if ( 'div' != $args['style'] ) : ?>
+    <<?php echo $tag ?><?php comment_class(empty($args['has_children']) ? '' : 'parent') ?> id="comment-<?php comment_ID() ?>">
+    <?php if ('div' != $args['style']) : ?>
     <div id="div-comment-<?php comment_ID() ?>" class="comment-body">
-    <?php endif; ?>
+<?php endif; ?>
     <div class="comment-author vcard">
-    <?php if ($args['avatar_size'] != 0) echo get_avatar( $comment, $args['avatar_size'] ); ?>
-    <?php printf(__('<cite class="fn">%s</cite> <span class="says">says:</span>'), get_comment_author_link()) ?>
+        <?php if ($args['avatar_size'] != 0) echo get_avatar($comment, $args['avatar_size']); ?>
+        <?php printf(__('<cite class="fn">%s</cite> <span class="says">says:</span>'), get_comment_author_link()) ?>
     </div>
-<?php if ($comment->comment_approved == '0') : ?>
+    <?php if ($comment->comment_approved == '0') : ?>
     <em class="comment-awaiting-moderation"><?php _e('Your comment is awaiting moderation.') ?></em>
-    <br />
+    <br/>
 <?php endif; ?>
 
-    <div class="comment-meta commentmetadata"><a href="<?php echo htmlspecialchars( get_comment_link( $comment->comment_ID ) ) ?>">
-        <?php
-            printf( __('%1$s at %2$s'), get_comment_date(),  get_comment_time()) ?></a><?php edit_comment_link(__('(Edit)'),'  ','' );
+    <div class="comment-meta commentmetadata"><a
+            href="<?php echo htmlspecialchars(get_comment_link($comment->comment_ID)) ?>">
+            <?php
+            printf(__('%1$s at %2$s'), get_comment_date(), get_comment_time()) ?></a><?php edit_comment_link(__('(Edit)'), '  ', '');
         ?>
     </div>
 
     <?php comment_text() ?>
 
     <div class="reply">
-    <?php comment_reply_link(array_merge( $args, array('add_below' => $add_below, 'depth' => $depth, 'max_depth' => $args['max_depth']))) ?>
+        <?php comment_reply_link(array_merge($args, array('add_below' => $add_below, 'depth' => $depth, 'max_depth' => $args['max_depth']))) ?>
     </div>
-    <?php if ( 'div' != $args['style'] ) : ?>
+    <?php if ('div' != $args['style']) : ?>
     </div>
-    <?php endif; ?>
+<?php endif; ?>
 <?php }
 
 /*------------------------------------*\
@@ -441,8 +460,9 @@ add_filter('excerpt_more', 'html5_blank_view_article'); // Add 'View Article' bu
 add_filter('show_admin_bar', 'remove_admin_bar'); // Remove Admin bar
 add_filter('style_loader_tag', 'html5_style_remove'); // Remove 'text/css' from enqueued stylesheet
 add_filter('post_thumbnail_html', 'remove_thumbnail_dimensions', 10); // Remove width and height dynamic attributes to thumbnails
-add_filter('post_thumbnail_html', 'remove_width_attribute', 10 ); // Remove width and height dynamic attributes to post images
-add_filter('image_send_to_editor', 'remove_width_attribute', 10 ); // Remove width and height dynamic attributes to post images
+add_filter('post_thumbnail_html', 'remove_width_attribute', 10); // Remove width and height dynamic attributes to post images
+add_filter('image_send_to_editor', 'remove_width_attribute', 10); // Remove width and height dynamic attributes to post images
+add_filter('style_loader_tag', 'import_html', 10, 3); //Replace the rel=stylesheet with rel=import
 
 // Remove Filters
 remove_filter('the_excerpt', 'wpautop'); // Remove <p> tags from Excerpt altogether
@@ -452,27 +472,29 @@ remove_filter('the_excerpt', 'wpautop'); // Remove <p> tags from Excerpt altoget
  * Add the field "seo" and "thumbnail" to REST API responses for posts and pages read
  */
 
-add_action( 'rest_api_init', 'slug_register' );
+add_action('rest_api_init', 'slug_register');
 
-function slug_register() {
-    register_rest_field( ['post', 'page'],
+function slug_register()
+{
+    register_rest_field(['post', 'page'],
         'seo',
         array(
-            'get_callback'    => 'slug_get_seo',
+            'get_callback' => 'slug_get_seo',
             'update_callback' => null,
-            'schema'          => null,
+            'schema' => null,
         )
     );
 
-    register_rest_field( ['post', 'page'],
+    register_rest_field(['post', 'page'],
         'thumbnail',
         array(
-            'get_callback'    => 'slug_get_thumbnail',
+            'get_callback' => 'slug_get_thumbnail',
             'update_callback' => null,
-            'schema'          => null,
+            'schema' => null,
         )
     );
 }
+
 /**
  * Handler for getting custom field data.
  *
@@ -484,7 +506,8 @@ function slug_register() {
  *
  * @return mixed
  */
-function slug_get_seo( $object, $field_name, $request ) {
+function slug_get_seo($object, $field_name, $request)
+{
     //TODO Recover SEO YOAST information if installed
     $title = $object['title']['rendered'];
     $description = $object['excerpt']['rendered'];
@@ -493,11 +516,44 @@ function slug_get_seo( $object, $field_name, $request ) {
         "title" => substr($title, 0, 59),
         "description" => substr($description, 0, 159)
     );
-};
+}
+
+;
 
 
-function slug_get_thumbnail($object, $field_name, $request){
-    return wp_get_attachment_url( $object['featured_media'] );
+function slug_get_thumbnail($object, $field_name, $request)
+{
+    return wp_get_attachment_url($object['featured_media']);
+}
+
+
+// create custom plugin settings menu
+add_action('admin_menu', 'polymer_theme_create_admin');
+
+function polymer_theme_create_admin()
+{
+    //create new top-level menu
+    add_menu_page('polymer-theme', 'polymer-theme', 'administrator', __FILE__, 'polymer_theme_view', get_template_directory_uri() . '/images/polymer.svg');
+
+    //call register settings function
+    add_action( 'admin_init', 'register_polymer_theme_settings' );
+}
+
+
+function register_polymer_theme_settings()
+{
+    //register our settings
+    register_setting('polymer-theme', 'settings');
+    register_setting('polymer-theme', 'templates');
+}
+
+function polymer_theme_view() {
+    //TODO Recover options/settings
+    ?>
+    <polymer-theme-admin options-name='polymer-theme'
+                         options='{}'
+                         templates='[]'></polymer-theme-admin>
+    <?php
 }
 
 

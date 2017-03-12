@@ -8,7 +8,7 @@ It is still in development stage and some bugs may appear.
 ## Overview
 A demo can be found in [wp.trofrigo.me](http://wp.trofrigo.me)
 ## Technology
-In order to work, this [WP REST API](http://v2.wp-api.org/), must be installed.
+In order to work, this [WP REST API](http://v2.wp-api.org/), must be installed for a Wordpress version lower than 4.7.3.
 To increase the speed and improve the user experience, [Varnish](https://varnish-cache.org/) can be installed.
 
 

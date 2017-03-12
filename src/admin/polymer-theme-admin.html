@@ -1,0 +1,88 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="polymer-theme-admin">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+
+            :host app-drawer-layout {
+                padding: 0 20px;
+            }
+        </style>
+        <app-drawer-layout>
+            <app-header id="header" fixed condenses>
+                <app-toolbar>
+                    <div main-title>&lt;polymer-theme-admin&gt;</div>
+                </app-toolbar>
+                <paper-tabs selected="{{ view }}" sticky>
+                    <paper-tab>General Settings</paper-tab>
+                    <paper-tab>Templates</paper-tab>
+                </paper-tabs>
+            </app-header>
+
+            <iron-pages selected="{{ view }}"
+                        fallback-selection="0">
+                <div>
+                    <!-- Settings -->
+                    <h2>General Settings</h2>
+                    <form is="iron-form"
+                          method="post"
+                          action="options.php">
+                        <paper-input label="Favicon"
+                                     name="[[ getName('settings', 'favicon') ]]"
+                                     value="{{ options.settings.favicon }}">
+                        </paper-input>
+                        <paper-input label="Base url"
+                                     name="[[ getName('settings', 'baseUrl') ]]"
+                                     value="{{ options.settings.baseUrl }}">
+                        </paper-input>
+                        <paper-input label="Theme color"
+                                     name="[[ getName('settings', 'themeColor') ]]"
+                                     value="{{ options.settings.themeColor }}">
+                        </paper-input>
+                    </form>
+                </div>
+                <div>
+                    <!-- Templates -->
+                    <h2>Templates</h2>
+                </div>
+            </iron-pages>
+        </app-drawer-layout>
+
+    </template>
+    <script>
+        Polymer({
+            is: 'polymer-theme-admin',
+            properties: {
+                language: 'en',
+                /** Name of the theme's options */
+                optionsName: String,
+                /** Options values */
+                options: Object,
+                getName: {
+                    type: 'Function',
+                    computed : '_getName(optionsName)'
+                }
+            },
+
+            _getName : function(optionsName){
+                return function (section, variable) {
+                    return optionsName + '[\'' + section + '\'][\'' + variable + '\']';
+                }
+            }
+        });
+    </script>
+</dom-module>
