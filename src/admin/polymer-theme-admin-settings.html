@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+
+<dom-module id="polymer-theme-admin-settings">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+        <h2>General Settings</h2>
+        <form id="form"
+              is="iron-form">
+            <paper-input label="Favicon"
+                         required
+                         value="{{ options.favicon }}">
+            </paper-input>
+            <paper-input label="Base url"
+                         value="{{ options.baseUrl }}">
+            </paper-input>
+            <paper-input label="Theme color"
+                         value="{{ options.themeColor }}">
+            </paper-input>
+        </form>
+    </template>
+    <script>
+        Polymer({
+            is: 'polymer-theme-admin-settings',
+            properties: {
+                options: Object
+            }
+        })
+    </script>
+</dom-module>

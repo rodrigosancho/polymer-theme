@@ -157,8 +157,8 @@ function polymer_theme_header_scripts()
         //Adding Webcomponents polyfill
         wp_register_script('webcomponents_polyfill', get_template_directory_uri() . '/bower_components/webcomponentsjs/webcomponents-lite.min.js', array());
         wp_enqueue_script('webcomponents_polyfill');
-        //Adding polymer-theme-admin element
-        wp_register_style('import_html', get_template_directory_uri() . '/src/admin/polymer-theme-admin.html', array());
+        //Adding polymer-theme-admin-shell element
+        wp_register_style('import_html', get_template_directory_uri() . '/src/admin/polymer-theme-admin-shell.html', array());
         wp_enqueue_style('import_html');
     }
 }
@@ -566,13 +566,13 @@ function create_polymer_theme_view()
     //TODO Recover templates
     $templates = [];
     ?>
-    <polymer-theme-admin url="<?= get_admin_url().'admin-ajax.php'; ?>"
+    <polymer-theme-admin-shell url="<?= get_admin_url().'admin-ajax.php'; ?>"
                          options-name='polymer-theme-options'
                          options='<?= json_encode($options); ?>'
                          nonce="<?= wp_create_nonce('polymer-theme-nonce'); ?>"
                          action="update_polymer-theme_options"
                          templates='<?= json_encode($templates); ?>'>
-    </polymer-theme-admin>
+    </polymer-theme-admin-shell>
     <?php
 }
 

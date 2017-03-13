@@ -1,0 +1,28 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+
+<dom-module id="polymer-theme-admin-templates">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+        <h2>Templates</h2>
+        <form id="form"
+              is="iron-form">
+        </form>
+    </template>
+    <script>
+        Polymer({
+            is: 'polymer-theme-admin-templates',
+            properties: {
+                options: Object
+            }
+        })
+    </script>
+</dom-module>

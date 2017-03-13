@@ -6,14 +6,17 @@
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+<link rel="import" href="polymer-theme-admin-settings.html">
+<link rel="import" href="polymer-theme-admin-templates.html">
+<link rel="import" href="polymer-theme-admin-analytics.html">
 
 <link rel="import" href="../shared/shared-styles.html">
 
-<dom-module id="polymer-theme-admin">
+<dom-module id="polymer-theme-admin-shell">
     <template>
         <style>
             :host {
@@ -27,7 +30,7 @@
         <app-drawer-layout>
             <app-header id="header" fixed condenses>
                 <app-toolbar>
-                    <div main-title>&lt;polymer-theme-admin&gt;</div>
+                    <div main-title>&lt;polymer-theme-admin/&gt;</div>
                 </app-toolbar>
                 <paper-tabs selected="{{ view }}" sticky>
                     <paper-tab>General Settings</paper-tab>
@@ -36,45 +39,32 @@
                 </paper-tabs>
             </app-header>
 
+            <paper-toast id="toast" duration="5000"></paper-toast>
+
             <iron-ajax id="ajax"
                        method="post"
                        url="[[ url ]]"
                        content-type="application/json"
                        params="[[ params ]]"
-                       body="[[ options ]]"></iron-ajax>
+                       body="[[ options ]]"
+                       on-response="_notify"></iron-ajax>
 
-                <iron-pages id="pages"
-                            selected="{{ view }}"
-                            fallback-selection="0">
-                    <div class="page">
-                        <!-- Settings -->
-                        <h2>General Settings</h2>
-                        <form id="form"
-                              is="iron-form">
-                            <paper-input label="Favicon"
-                                         required
-                                         name="[[ getName('settings', 'favicon') ]]"
-                                         value="{{ options.favicon }}">
-                            </paper-input>
-                            <paper-input label="Base url"
-                                         name="[[ getName('settings', 'baseUrl') ]]"
-                                         value="{{ options.baseUrl }}">
-                            </paper-input>
-                            <paper-input label="Theme color"
-                                         name="[[ getName('settings', 'themeColor') ]]"
-                                         value="{{ options.themeColor }}">
-                            </paper-input>
-                        </form>
-                    </div>
-                    <div class="page">
-                        <!-- Templates -->
-                        <h2>Templates</h2>
-                    </div>
-                    <div class="page">
-                        <!-- Analytics -->
-                        <h2>Analytics</h2>
-                    </div>
-                </iron-pages>
+            <iron-pages id="pages"
+                        selected="{{ view }}"
+                        fallback-selection="0">
+                <!-- Settings -->
+                <polymer-theme-admin-settings class="page"
+                                              options="{{ options.settings }}">
+                </polymer-theme-admin-settings>
+                <!-- Templates -->
+                <polymer-theme-admin-templates class="page"
+                                               options="{{ options.templates }}">
+                </polymer-theme-admin-templates>
+                <!-- Analytics -->
+                <polymer-theme-admin-analytics class="page"
+                                               options="{{ options.analytics }}">
+                </polymer-theme-admin-analytics>
+            </iron-pages>
 
             <paper-button on-click="_submit">Save</paper-button>
         </app-drawer-layout>
@@ -82,7 +72,7 @@
     </template>
     <script>
         Polymer({
-            is: 'polymer-theme-admin',
+            is: 'polymer-theme-admin-shell',
             properties: {
                 language: 'en',
                 /** admin-ajax.php path */
@@ -90,13 +80,20 @@
                 /** Name of the theme's options */
                 optionsName: String,
                 /** Options values */
-                options: Object,
+                options: {
+                    type: Object,
+                    value: {
+                        settings: {},
+                        templates: {},
+                        analytics: {}
+                    }
+                },
                 getName: {
                     type: 'Function',
                     computed: '_getName(optionsName)'
                 },
                 nonce: String,
-                action : String,
+                action: String,
                 params: {
                     type: Object,
                     computed: '_mountParams(action, nonce)'
@@ -108,15 +105,31 @@
                 }
             },
 
-            _mountParams: function (action, nonce){
+            _mountParams: function (action, nonce) {
                 return {
                     action: action,
                     _nonce: nonce
-               };
+                };
             },
 
             _submit: function () {
-                this.$.ajax.generateRequest();
+                var pages = this.$.pages.querySelectorAll('.page'),
+                    validated = true;
+
+                pages.forEach(function (page, index) {
+                    var form = page.querySelector('form[is="iron-form"]');
+                    if(form && !form.validate()){
+                        validated = false;
+                        this.view = index;
+                    }
+                }.bind(this));
+
+                if(validated)
+                    this.$.ajax.generateRequest();
+            },
+            _notify: function(){
+                this.$.toast.text = "Options saved!";
+                this.$.toast.opened = true;
             }
         });
     </script>
