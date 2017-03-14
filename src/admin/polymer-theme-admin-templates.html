@@ -2,6 +2,9 @@
 
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-select/paper-select.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 
 
 <dom-module id="polymer-theme-admin-templates">
@@ -10,19 +13,154 @@
             :host {
                 display: block;
             }
+
+            :host .add-row paper-select {
+                width: 43%;
+                display: inline-block;
+                float: left;
+                margin: 0 1%;
+            }
+
+            :host .add-row paper-icon-button {
+                margin-top: 16px;
+            }
+
+            ::content table {
+                width: 100%;
+                border-spacing: 0;
+                margin-top: 40px;
+            }
+
+            ::content table th{
+                padding: 10px 0;
+                text-align: left;
+                border-bottom: 2px solid #ddd;
+            }
+
+            ::content table td{
+                border-bottom: 1px solid #ddd;
+            }
         </style>
 
         <h2>Templates</h2>
         <form id="form"
               is="iron-form">
+            <div class="add-row">
+                <paper-select label="Post"
+                              language="[[ language ]]"
+                              selected="{{ _post }}"
+                              options="[[ posts ]]"
+                              option-value-attr="slug"
+                              option-label-attr="title"
+                              error-message="There's already define a template for this post"
+                              search>
+                </paper-select>
+                <paper-select label="Template"
+                              language="[[ language ]]"
+                              selected="{{ _template_file }}"
+                              options="[[ templates ]]"
+                              search>
+                </paper-select>
+                <paper-icon-button icon="add" on-click="_addTemplate"></paper-icon-button>
+            </div>
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Post</th>
+                    <th>Template</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <template is="dom-repeat"
+                              items="{{ options.templates }}">
+                        <tr>
+                            <td>[[ _getPostName(item.slug, posts) ]]</td>
+                            <td>[[ item.template ]]</td>
+                            <td>
+                                <paper-icon-button icon="delete"
+                                                    on-click="_deleteTemplate">
+                                </paper-icon-button>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+
+
+
         </form>
     </template>
     <script>
         Polymer({
             is: 'polymer-theme-admin-templates',
             properties: {
-                options: Object
-            }
+                options: Object,
+                /** List of all posts */
+                posts: Array,
+                /** List of templates */
+                templates: Array,
+
+                _template_file: String,
+                _post: String
+            },
+
+            attached: function () {
+                if(typeof this.get('options.templates') === 'undefined'){
+                    this.set('options.templates', []);
+                }
+            },
+
+            _addTemplate: function (event) {
+                var index = this._getIndex(this._post, this.options.templates);
+
+                //Checking if there is not repeated
+                if(index < 0){
+                    this.push('options.templates', {
+                        slug: this._post,
+                        template: this._template_file
+                    });
+                    //Resetting selects
+                    this._post = null;
+                    this._template_file = null;
+                }else{
+                    this.fire('notify', {
+                        message: "There's already a template for this post"
+                    });
+                }
+            },
+
+            _deleteTemplate: function(event){
+                var template = event.model.item,
+                    index = this._getIndex(template.slug, this.options.templates);
+
+                if(index > -1){
+                    this.splice('options.templates', index, 1);
+                }
+            },
+
+            _getIndex : function(slug, posts){
+                var slugs = posts.map(function(post){
+                    return post.slug;
+                });
+
+                return slugs.indexOf(slug);
+            },
+
+            _getPostName : function(slug, posts){
+                var post = posts.filter(function(post){
+                    return post.slug === slug;
+                })[0];
+
+                return (post)
+                        ? post.title
+                        : '';
+            },
+
+
+
+
         })
     </script>
 </dom-module>

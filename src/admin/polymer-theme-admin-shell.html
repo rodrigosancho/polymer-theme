@@ -39,7 +39,7 @@
                 </paper-tabs>
             </app-header>
 
-            <paper-toast id="toast" duration="5000"></paper-toast>
+            <paper-toast id="toast" duration="3000"></paper-toast>
 
             <iron-ajax id="ajax"
                        method="post"
@@ -47,26 +47,33 @@
                        content-type="application/json"
                        params="[[ params ]]"
                        body="[[ options ]]"
-                       on-response="_notify"></iron-ajax>
+                       loading="{{ saving }}"
+                       on-response="_onResponse"></iron-ajax>
 
             <iron-pages id="pages"
                         selected="{{ view }}"
                         fallback-selection="0">
                 <!-- Settings -->
                 <polymer-theme-admin-settings class="page"
+                                              language="[[ language ]]"
                                               options="{{ options.settings }}">
                 </polymer-theme-admin-settings>
                 <!-- Templates -->
                 <polymer-theme-admin-templates class="page"
-                                               options="{{ options.templates }}">
+                                               language="[[ language ]]"
+                                               options="{{ options.templates }}"
+                                               templates="[[ templates ]]"
+                                               posts="[[ posts ]]">
                 </polymer-theme-admin-templates>
                 <!-- Analytics -->
                 <polymer-theme-admin-analytics class="page"
+                                               language="[[ language ]]"
                                                options="{{ options.analytics }}">
                 </polymer-theme-admin-analytics>
             </iron-pages>
 
-            <paper-button on-click="_submit">Save</paper-button>
+            <paper-button on-click="_submit"
+                          disabled$="[[ saving ]]">Save</paper-button>
         </app-drawer-layout>
 
     </template>
@@ -97,8 +104,15 @@
                 params: {
                     type: Object,
                     computed: '_mountParams(action, nonce)'
-                }
+                },
+                templates: Array,
+                posts: Array
             },
+
+            listeners : {
+                'notify' : '_onNotify'
+            },
+
             _getName: function (optionsName) {
                 return function (section, variable) {
                     return optionsName + '[\'' + section + '\'][\'' + variable + '\']';
@@ -127,8 +141,15 @@
                 if(validated)
                     this.$.ajax.generateRequest();
             },
-            _notify: function(){
-                this.$.toast.text = "Options saved!";
+
+            _onResponse : function(){
+                this.fire('notify', {
+                    message: "Options saved!"
+                });
+            },
+
+            _onNotify: function(event){
+                this.$.toast.text = event.detail.message;
                 this.$.toast.opened = true;
             }
         });
