@@ -16,7 +16,6 @@
         <form id="form"
               is="iron-form">
             <paper-input label="Favicon"
-                         required
                          value="{{ options.favicon }}">
             </paper-input>
             <paper-input label="Base url"
@@ -24,6 +23,9 @@
             </paper-input>
             <paper-input label="Theme color"
                          value="{{ options.themeColor }}">
+            </paper-input>
+            <paper-input label="Analytics code"
+                         value="{{ options.analytics }}">
             </paper-input>
         </form>
     </template>

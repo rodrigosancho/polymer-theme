@@ -50,6 +50,10 @@
                 }
             },
 
+            ready: function(){
+                console.log("yolo");
+            },
+
             init: function () {
                 this.$.service.getPostBySlug(this.$.slug.value);
             },

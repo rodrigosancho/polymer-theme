@@ -12,7 +12,6 @@
 
 <link rel="import" href="polymer-theme-admin-settings.html">
 <link rel="import" href="polymer-theme-admin-templates.html">
-<link rel="import" href="polymer-theme-admin-analytics.html">
 
 <link rel="import" href="../shared/shared-styles.html">
 
@@ -35,7 +34,6 @@
                 <paper-tabs selected="{{ view }}" sticky>
                     <paper-tab>General Settings</paper-tab>
                     <paper-tab>Templates</paper-tab>
-                    <paper-tab>Analytics</paper-tab>
                 </paper-tabs>
             </app-header>
 
@@ -65,11 +63,6 @@
                                                templates="[[ templates ]]"
                                                posts="[[ posts ]]">
                 </polymer-theme-admin-templates>
-                <!-- Analytics -->
-                <polymer-theme-admin-analytics class="page"
-                                               language="[[ language ]]"
-                                               options="{{ options.analytics }}">
-                </polymer-theme-admin-analytics>
             </iron-pages>
 
             <paper-button on-click="_submit"
@@ -92,7 +85,6 @@
                     value: {
                         settings: {},
                         templates: {},
-                        analytics: {}
                     }
                 },
                 getName: {

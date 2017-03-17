@@ -141,10 +141,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
 
     <script>
-
-        // performance logging
-        window.performance && performance.mark && performance.mark('polymer-theme - before register');
-
         Polymer({
             is: 'polymer-theme-shell',
 
@@ -161,14 +157,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: String,
                     reflectToAttribute: true
                 },
-                menus: {
-                    type: Object,
-                    value: {}
-                },
+                menus: Object,
                 menu: {
                     type: Function,
                     computed: '_getMenu(menus)'
-                }
+                },
+
+                templates: Object,
+
+                state: Object
             },
 
             observers: [
@@ -199,6 +196,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
 
             _routePageChanged: function (dataRoute) {
+
+                console.log(dataRoute);
+
                 var taxonomy = dataRoute.taxonomy,
                         slug = dataRoute.slug;
 
@@ -220,23 +220,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.taxonomy = taxonomy;
                 this.slug = slug;
 
-                var template;
                 // Load page import on demand. Show 404 page if fails
-                var resolvedCustomTemplateUrl = this.resolveUrl('../templates/template-' + slug + '.html');
-                var resolvedRegularTemplateUrl = this.resolveUrl('../templates/template-' + taxonomy + '-detail.html');
-                // First of all, try to load any possible custom template
-                this.importHref(resolvedCustomTemplateUrl,
+                var templateFile = (this.templates[slug])
+                        ? this.templates[slug]
+                        : 'template-' + taxonomy + '-detail.html',
+                    templateFileUrl = this.resolveUrl('../templates/' + templateFile);
+
+                this.importHref(templateFileUrl,
                         function () {
-                            this._setView(slug);
+                            this._setView(templateFile.replace('.html', ''));
                         },
-                        function () {
-                            // If a custom template does not exist, load the taxonomy regular template
-                            this.importHref(resolvedRegularTemplateUrl,
-                                    function () {
-                                        this._setView(taxonomy + '-detail');
-                                    },
-                                    this._showPage404, true);
-                        }, true);
+                        this._showPage404, true);
             },
 
             _setView: function (template) {
@@ -247,11 +241,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.template = template;
                 }.bind(this);
 
-                var view = this.$.pages.querySelector('template-' + template);
+                var view = this.$.pages.querySelector(template);
 
                 //Adding template if necesary
                 if (!view) {
-                    view = document.createElement('template-' + template);
+                    view = document.createElement(template);
                     view.setAttribute('id', template);
                     this.$.pages.appendChild(view);
                 }
@@ -276,11 +270,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
 
             _onMoveScroll: function (event) {
-//                try{
-//                    this.$.scrollPos.scroll(event.detail.x, event.detail.y);
-//                }catch(err){
-//                    console.error(err.message);
-//                }
                 Polymer.AppLayout.scroll({top: 0, behavior: 'silent'});
             },
 

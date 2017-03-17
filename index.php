@@ -1,3 +1,10 @@
+<?php
+    $options = get_option('polymer-theme_options');
+    $templates = $options->templates;
+    $state = $options->state;
+?>
+
+
 <!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -141,14 +148,8 @@
 <global-variable key="alias" value="/"></global-variable>
 
 <!-- App -->
-<polymer-theme-shell unresolved></polymer-theme-shell>
-
-<script>
-    (function () {
-        var shell = document.querySelector('polymer-theme-shell');
-        shell.menus = <?php echo get_menus(); ?>;
-    })()
-</script>
-
+<polymer-theme-shell menus='<?= get_menus(); ?>'
+                     templates='<?= json_encode($templates); ?>'
+                     state='<?= json_encode($state); ?>'></polymer-theme-shell>
 </body>
 </html>

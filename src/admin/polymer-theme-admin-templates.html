@@ -31,71 +31,72 @@
                 margin-top: 40px;
             }
 
-            ::content table th{
+            ::content table th {
                 padding: 10px 0;
                 text-align: left;
                 border-bottom: 2px solid #ddd;
             }
 
-            ::content table td{
+            ::content table td {
                 border-bottom: 1px solid #ddd;
             }
         </style>
 
         <h2>Templates</h2>
-        <form id="form"
-              is="iron-form">
-            <div class="add-row">
+        <div class="add-row">
+            <form id="form"
+                  is="iron-form">
                 <paper-select label="Post"
                               language="[[ language ]]"
                               selected="{{ _post }}"
                               options="[[ posts ]]"
                               option-value-attr="slug"
                               option-label-attr="title"
-                              error-message="There's already define a template for this post"
+                              error-message="You must select a post"
                               search>
                 </paper-select>
                 <paper-select label="Template"
                               language="[[ language ]]"
                               selected="{{ _template_file }}"
                               options="[[ templates ]]"
+                              error-message="you must select a template"
                               search>
                 </paper-select>
                 <paper-icon-button icon="add" on-click="_addTemplate"></paper-icon-button>
-            </div>
-
-            <table class="table">
-                <thead>
+            </form>
+        </div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Slug</th>
+                <th>Template</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <template is="dom-repeat"
+                      items="[[ _slugs ]]"
+                      as="slug">
                 <tr>
-                    <th>Post</th>
-                    <th>Template</th>
-                    <th>Actions</th>
+                    <td>[[ slug ]]</td>
+                    <td>[[ _getValue(slug, options) ]]</td>
+                    <td>
+                        <paper-icon-button icon="delete"
+                                           on-click="_deleteTemplate">
+                        </paper-icon-button>
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                    <template is="dom-repeat"
-                              items="{{ options.templates }}">
-                        <tr>
-                            <td>[[ _getPostName(item.slug, posts) ]]</td>
-                            <td>[[ item.template ]]</td>
-                            <td>
-                                <paper-icon-button icon="delete"
-                                                    on-click="_deleteTemplate">
-                                </paper-icon-button>
-                            </td>
-                        </tr>
-                    </template>
-                </tbody>
-            </table>
+            </template>
+            </tbody>
+        </table>
 
 
-
-        </form>
     </template>
     <script>
         Polymer({
             is: 'polymer-theme-admin-templates',
             properties: {
+                /** Templates config object */
                 options: Object,
                 /** List of all posts */
                 posts: Array,
@@ -103,64 +104,45 @@
                 templates: Array,
 
                 _template_file: String,
-                _post: String
-            },
-
-            attached: function () {
-                if(typeof this.get('options.templates') === 'undefined'){
-                    this.set('options.templates', []);
+                _post: String,
+                _slugs: {
+                    type: Array,
+                    computed : '_getKeys(options.*)'
                 }
             },
 
             _addTemplate: function (event) {
-                var index = this._getIndex(this._post, this.options.templates);
+                if (!this.$.form.validate()) return;
 
                 //Checking if there is not repeated
-                if(index < 0){
-                    this.push('options.templates', {
-                        slug: this._post,
-                        template: this._template_file
-                    });
+                if (typeof this.options[this._post] === 'undefined') {
+                    this.set('options.' + this._post, this._template_file);
                     //Resetting selects
                     this._post = null;
                     this._template_file = null;
-                }else{
+                } else {
                     this.fire('notify', {
                         message: "There's already a template for this post"
                     });
                 }
             },
 
-            _deleteTemplate: function(event){
-                var template = event.model.item,
-                    index = this._getIndex(template.slug, this.options.templates);
+            _deleteTemplate: function (event) {
+                var slug = event.model.slug;
 
-                if(index > -1){
-                    this.splice('options.templates', index, 1);
+                if (typeof this.get('options.' + slug) !== 'undefined') {
+                    delete this.options[slug];
+                    this.notifyPath('options.*', this.options);
                 }
             },
 
-            _getIndex : function(slug, posts){
-                var slugs = posts.map(function(post){
-                    return post.slug;
-                });
-
-                return slugs.indexOf(slug);
+            _getKeys: function (object) {
+                return Object.keys(object.base);
             },
 
-            _getPostName : function(slug, posts){
-                var post = posts.filter(function(post){
-                    return post.slug === slug;
-                })[0];
-
-                return (post)
-                        ? post.title
-                        : '';
-            },
-
-
-
-
+            _getValue: function (key, object) {
+                return object[key];
+            }
         })
     </script>
 </dom-module>
