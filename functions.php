@@ -538,8 +538,6 @@ function slug_get_thumbnail($object, $field_name, $request)
 
 // create custom plugin settings menu
 add_action('admin_menu', 'polymer_theme_create_admin');
-//call register settings function
-add_action('admin_init', 'register_polymer_theme_settings');
 
 function polymer_theme_create_admin()
 {
@@ -553,12 +551,6 @@ function polymer_theme_create_admin()
         get_template_directory_uri() . '/images/polymer.svg');
 }
 
-
-function register_polymer_theme_settings()
-{
-    //TODO register our settings
-}
-
 function create_polymer_theme_view()
 {
     //Recovering options
@@ -570,7 +562,7 @@ function create_polymer_theme_view()
     });
     $templates = array_values($filter_dir_content);
     //Recovering pages
-    $args = array('post_type' => array('post', 'page'));
+    $args = array('post_type' => 'any');
     $query = new WP_Query ($args);
     $posts = array_map(function ($k) {
         return array(
@@ -606,7 +598,7 @@ function post_love_add_love()
     die();
 }
 
-
+include('polymer-theme-API.php');
 
 
 
