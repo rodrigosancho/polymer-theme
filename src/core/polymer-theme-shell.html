@@ -1,13 +1,3 @@
-<!--
-@license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
@@ -16,7 +6,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
-<link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
@@ -24,6 +13,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../../bower_components/global-variable/global-variable.html">
 
 <link rel="import" href="../shared/polymer-theme-icons.html">
+
+<link rel="import" href="polymer-theme-router.html">
 
 <dom-module id="polymer-theme-shell">
     <template>
@@ -92,10 +83,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="alias" value="{{ alias }}"></global-variable>
 
         <app-location route="{{route}}"></app-location>
-        <app-route route="{{route}}"
-                   pattern="[[alias]]:taxonomy/:slug"
-                   data="{{routeData}}"
-                   tail="{{subroute}}"></app-route>
+        <polymer-theme-router route="[[ route ]]"
+                              on-found-next="_changePage"></polymer-theme-router>
+        <!--<app-route route="{{route}}"-->
+                   <!--pattern="[[alias]]:taxonomy/:slug"-->
+                   <!--data="{{routeData}}"-->
+                   <!--tail="{{subroute}}"></app-route>-->
 
         <app-drawer-layout id="drawerLayout" fullbleed>
             <!-- Drawer content -->
@@ -168,10 +161,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 state: Object
             },
 
-            observers: [
-                '_routePageChanged(routeData)'
-            ],
-
             listeners: {
                 'update-head': '_onUpdateHead',
                 'move-scroll': '_onMoveScroll'
@@ -195,45 +184,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.offline = !navigator.onLine;
             },
 
-            _routePageChanged: function (dataRoute) {
+            _changePage: function (event) {
 
-                console.log(dataRoute);
-
-                var taxonomy = dataRoute.taxonomy,
-                        slug = dataRoute.slug;
-
-                if (typeof taxonomy != 'undefined' && typeof slug != 'undefined') {
-                    if (taxonomy != '' && slug != '') {
-                        this._changePage(taxonomy, slug);
-                    } else if (taxonomy != '' && slug == '') {
-                        this._changePage('page', taxonomy);
-                    } else {
-                        this._showHome();
-                    }
-                } else {
-                    this._showHome();
-                }
-            },
-
-            _changePage: function (taxonomy, slug) {
-
-                this.taxonomy = taxonomy;
-                this.slug = slug;
+                this.taxonomy = event.detail.item.type;
+                this.slug = event.detail.item.slug;
 
                 // Load page import on demand. Show 404 page if fails
-                var templateFile = (this.templates[slug])
-                        ? this.templates[slug]
-                        : 'template-' + taxonomy + '-detail.html',
+                var templateFile = (this.templates[this.slug])
+                        ? this.templates[this.slug]
+                        : 'template-' + this.taxonomy + '-detail.html',
                     templateFileUrl = this.resolveUrl('../templates/' + templateFile);
 
                 this.importHref(templateFileUrl,
                         function () {
-                            this._setView(templateFile.replace('.html', ''));
+                            this._setView(templateFile.replace('.html', ''), event.detail.item);
                         },
                         this._showPage404, true);
             },
 
-            _setView: function (template) {
+            _setView: function (template, item) {
                 var _onReady = function () {
                     //Closing lateral menu
                     this._closeMenu();
@@ -252,7 +221,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 view.addEventListener('ready', _onReady);
 
-                view.init();
+                view.init(item);
             },
 
             _onUpdateHead: function (event) {
@@ -273,15 +242,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 Polymer.AppLayout.scroll({top: 0, behavior: 'silent'});
             },
 
-            _showHome: function () {
-                if (this.frontPage)
-                    this._changePage('page', this.frontPage);
-                else
-                    this._showPage404();
-            },
-
             _showPage404: function () {
-                this._changePage('page', '404');
+                var templateFile = 'template-404.html',
+                    templateFileUrl = this.resolveUrl('../templates/' + templateFile);
+                this.importHref(templateFileUrl,
+                        function () {
+                            this._setView(templateFile.replace('.html', ''));
+                        },
+                        null, true);
             },
 
             _closeMenu: function () {

@@ -19,8 +19,7 @@
 
         <polymer-theme-service id="service"
                                loading="{{ loading }}"
-                               on-posts-received="_onPostsReceived"
-                               on-page-received="_onPageReceived">
+                               on-posts-received="_onPostsReceived">
         </polymer-theme-service>
 
         <template is="dom-repeat"
@@ -58,20 +57,13 @@
             },
 
             init: function () {
-                //Fetching posts
-                this.$.service.getPageBySlug("blog");
                 //Fetching blog page information (seo)
                 this.$.service.getPosts();
             },
 
             _onPostsReceived: function (event) {
                 this.set('posts', event.detail.response);
-                this.fire('ready', {});
-            },
-
-            _onPageReceived: function (event) {
-                var page = event.detail.response[0];
-                this.fire('update-head', page.seo);
+                this.fire('ready');
             }
         });
     </script>
