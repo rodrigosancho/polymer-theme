@@ -518,23 +518,11 @@ function slug_get_seo($object, $field_name, $request)
     );
 }
 
-;
-
 
 function slug_get_thumbnail($object, $field_name, $request)
 {
     return wp_get_attachment_url($object['featured_media']);
 }
-
-//add_filter( 'theme_page_templates', 'adding_polymer_theme_templates' );
-//
-//function adding_polymer_theme_templates( $post_templates ) {
-//    if ( version_compare( $GLOBALS['wp_version'], '4.7', '<' ) ) {
-//        array_push($post_templates, 'templates/template-blog.html');
-//    }
-//    return $post_templates;
-//}
-
 
 // create custom plugin settings menu
 add_action('admin_menu', 'polymer_theme_create_admin');
@@ -575,7 +563,7 @@ function create_polymer_theme_view()
     ?>
     <polymer-theme-admin-shell url="<?= get_admin_url() . 'admin-ajax.php'; ?>"
                                options-name='polymer-theme-options'
-                               options='<?= json_encode($options); ?>'
+       <?php if($options) { ?> options='<?= json_encode($options); ?>' <?php } ?>
                                nonce="<?= wp_create_nonce('polymer-theme-nonce'); ?>"
                                action="update_polymer-theme_options"
                                templates='<?= json_encode($templates); ?>'

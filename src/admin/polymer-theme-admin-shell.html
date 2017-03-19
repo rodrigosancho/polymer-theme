@@ -98,7 +98,10 @@
         Polymer({
             is: 'polymer-theme-admin-shell',
             properties: {
-                language: 'en',
+                language: {
+                    type: String,
+                    value: 'en'
+                },
                 /** admin-ajax.php path */
                 url: String,
                 /** Name of the theme's options */
@@ -108,7 +111,7 @@
                     type: Object,
                     value: {
                         settings: {},
-                        templates: {},
+                        templates: {}
                     }
                 },
                 getName: {
