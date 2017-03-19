@@ -17,14 +17,36 @@
 
 <dom-module id="polymer-theme-admin-shell">
     <template>
-        <style>
+        <style include="shared-styles">
             :host {
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
                 display: block;
             }
 
-            :host app-drawer-layout {
+            :host iron-pages{
                 padding: 0 20px;
             }
+            :host app-drawer-layout {
+                margin-right: 20px;
+                background-color: white;
+                overflow: auto;
+            }
+
+            :host app-header, :host #save {
+                color: #fff;
+                background-color: var(--app-primary-color);
+            }
+
+            :host #save {
+                float: right;
+                margin: 20px;
+            }
+
+            :host app-header paper-icon-button {
+                --paper-icon-button-ink-color: white;
+            }
+
         </style>
         <app-drawer-layout>
             <app-header id="header" fixed condenses>
@@ -47,26 +69,28 @@
                        body="[[ options ]]"
                        loading="{{ saving }}"
                        on-response="_onResponse"></iron-ajax>
+            <div>
+                <iron-pages id="pages"
+                            selected="{{ view }}"
+                            fallback-selection="0">
+                    <!-- Settings -->
+                    <polymer-theme-admin-settings class="page"
+                                                  language="[[ language ]]"
+                                                  options="{{ options.settings }}">
+                    </polymer-theme-admin-settings>
+                    <!-- Templates -->
+                    <polymer-theme-admin-templates class="page"
+                                                   language="[[ language ]]"
+                                                   options="{{ options.templates }}"
+                                                   templates="[[ templates ]]"
+                                                   posts="[[ posts ]]">
+                    </polymer-theme-admin-templates>
+                </iron-pages>
 
-            <iron-pages id="pages"
-                        selected="{{ view }}"
-                        fallback-selection="0">
-                <!-- Settings -->
-                <polymer-theme-admin-settings class="page"
-                                              language="[[ language ]]"
-                                              options="{{ options.settings }}">
-                </polymer-theme-admin-settings>
-                <!-- Templates -->
-                <polymer-theme-admin-templates class="page"
-                                               language="[[ language ]]"
-                                               options="{{ options.templates }}"
-                                               templates="[[ templates ]]"
-                                               posts="[[ posts ]]">
-                </polymer-theme-admin-templates>
-            </iron-pages>
-
-            <paper-button on-click="_submit"
-                          disabled$="[[ saving ]]">Save</paper-button>
+                <paper-button id="save"
+                              on-click="_submit"
+                              disabled$="[[ saving ]]">Save</paper-button>
+            </div>
         </app-drawer-layout>
 
     </template>
@@ -123,7 +147,7 @@
                     validated = true;
 
                 pages.forEach(function (page, index) {
-                    var form = page.querySelector('form[is="iron-form"]');
+                    var form = page.querySelector('form[is="iron-form"].general-form');
                     if(form && !form.validate()){
                         validated = false;
                         this.view = index;

@@ -20,8 +20,6 @@
     <template>
         <style>
             :host {
-                --app-primary-color: #4285f4;
-                --app-secondary-color: black;
                 display: block;
             }
 
@@ -204,6 +202,10 @@
 
             _setView: function (template, item) {
                 var _onReady = function () {
+                    //Updating head
+                    if(item){
+                        this.fire('update-head', item.tags);
+                    }
                     //Closing lateral menu
                     this._closeMenu();
                     view.removeEventListener('ready', _onReady);

@@ -11,6 +11,8 @@
     <template>
         <style>
             :host {
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
                 display: block;
             }
 
@@ -35,6 +37,11 @@
                 padding: 10px 0;
                 text-align: left;
                 border-bottom: 2px solid #ddd;
+                width: 40%;
+            }
+
+            ::content table th:last-child {
+                width: 20%;
             }
 
             ::content table td {
@@ -52,6 +59,7 @@
                               options="[[ posts ]]"
                               option-value-attr="slug"
                               option-label-attr="title"
+                              required
                               error-message="You must select a post"
                               search>
                 </paper-select>
@@ -59,7 +67,8 @@
                               language="[[ language ]]"
                               selected="{{ _template_file }}"
                               options="[[ templates ]]"
-                              error-message="you must select a template"
+                              required
+                              error-message="You must select a template"
                               search>
                 </paper-select>
                 <paper-icon-button icon="add" on-click="_addTemplate"></paper-icon-button>
@@ -103,8 +112,14 @@
                 /** List of templates */
                 templates: Array,
 
-                _template_file: String,
-                _post: String,
+                _template_file: {
+                    type: String,
+                    value: ""
+                },
+                _post: {
+                    type: String,
+                    value: ""
+                },
                 _slugs: {
                     type: Array,
                     computed : '_getKeys(options.*)'
@@ -112,7 +127,7 @@
             },
 
             _addTemplate: function (event) {
-                if (!this.$.form.validate()) return;
+                if(!this.$.form.validate()) return;
 
                 //Checking if there is not repeated
                 if (typeof this.options[this._post] === 'undefined') {
@@ -128,11 +143,17 @@
             },
 
             _deleteTemplate: function (event) {
-                var slug = event.model.slug;
+                var slug = event.model.slug,
+                    options = {};
 
                 if (typeof this.get('options.' + slug) !== 'undefined') {
-                    delete this.options[slug];
-                    this.notifyPath('options.*', this.options);
+                    for(var property in this.options){
+                        if(this.options.hasOwnProperty(property) && property != slug){
+                            options[property] = this.options[property];
+                        }
+                    }
+
+                    this.set('options', options);
                 }
             },
 
@@ -141,6 +162,7 @@
             },
 
             _getValue: function (key, object) {
+
                 return object[key];
             }
         })
