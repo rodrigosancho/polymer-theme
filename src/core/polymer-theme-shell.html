@@ -85,10 +85,6 @@
         <app-location route="{{route}}"></app-location>
         <polymer-theme-router route="[[ route ]]"
                               on-found-next="_changePage"></polymer-theme-router>
-        <!--<app-route route="{{route}}"-->
-                   <!--pattern="[[alias]]:taxonomy/:slug"-->
-                   <!--data="{{routeData}}"-->
-                   <!--tail="{{subroute}}"></app-route>-->
 
         <app-drawer-layout id="drawerLayout" fullbleed>
             <!-- Drawer content -->
@@ -191,9 +187,9 @@
 
                 // Load page import on demand. Show 404 page if fails
                 var templateFile = (this.templates[this.slug])
-                        ? this.templates[this.slug]
-                        : 'template-' + this.taxonomy + '-detail.html',
-                    templateFileUrl = this.resolveUrl('../templates/' + templateFile);
+                                ? this.templates[this.slug]
+                                : 'template-' + this.taxonomy + '-detail.html',
+                        templateFileUrl = this.resolveUrl('../templates/' + templateFile);
 
                 this.importHref(templateFileUrl,
                         function () {
@@ -205,7 +201,7 @@
             _setView: function (template, item) {
                 var _onReady = function () {
                     //Updating head
-                    if(item){
+                    if (item) {
                         this.fire('update-head', item.tags);
                     }
                     //Closing lateral menu
@@ -215,12 +211,13 @@
                 }.bind(this);
 
                 var view = this.$.pages.querySelector(template);
+                //Adding template if necessary
 
-                //Adding template if necesary
+
                 if (!view) {
                     view = document.createElement(template);
                     view.setAttribute('id', template);
-                    this.$.pages.appendChild(view);
+                    Polymer.dom(this.$.pages).appendChild(view);
                 }
 
                 view.addEventListener('ready', _onReady);
@@ -229,11 +226,12 @@
             },
 
             _onUpdateHead: function (event) {
-                var metas = event.detail;
+                var metas = event.detail,
+                    docMetas = document.querySelectorAll('meta');
 
                 try {
                     document.title = metas.title;
-                    document.querySelectorAll('meta').forEach(function (meta) {
+                    [].forEach.call(docMetas, function (meta) {
                         if (typeof metas[meta.name] != 'undefined')
                             meta.content = metas[meta.name];
                     });
@@ -248,7 +246,7 @@
 
             _showPage404: function () {
                 var templateFile = 'template-404.html',
-                    templateFileUrl = this.resolveUrl('../templates/' + templateFile);
+                        templateFileUrl = this.resolveUrl('../templates/' + templateFile);
                 this.importHref(templateFileUrl,
                         function () {
                             this._setView(templateFile.replace('.html', ''));
@@ -260,7 +258,6 @@
                 //Closing the menu only under mobile width
                 var responsiveWidth = +(this.$.drawerLayout.responsiveWidth.replace('px', ''));
                 this._menuOpened = !(responsiveWidth > window.innerWidth);
-
             },
 
             _getMenu: function (menus) {

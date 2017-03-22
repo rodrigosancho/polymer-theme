@@ -29,7 +29,7 @@
             },
             _htmlChanged: function (html) {
                 // WARNING: potential XSS vulnerability if `html` comes from an untrusted source
-                this.$.content.innerHTML = html;
+                Polymer.dom(this.$.content).innerHTML = html;
             }
         });
     </script>
