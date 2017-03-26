@@ -28,20 +28,22 @@
             j.src =
                 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
             f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-TJSXJ3C');</script>
+        })(window, document, 'script', 'dataLayer', '<?= $settings->analytics ?>');</script>
     <!-- End Google Tag Manager -->
 
-    <link href="<?php echo get_template_directory_uri(); ?>/img/icons/favicon.ico" rel="shortcut icon">
-    <link href="<?php echo get_template_directory_uri(); ?>/img/icons/touch.png" rel="apple-touch-icon-precomposed">
+    <link href="<?= wp_get_attachment_url($settings->favicon); ?>"
+          rel="shortcut icon">
+    <link href="<?= wp_get_attachment_url($settings->icon48); ?>"
+          rel="apple-touch-icon-precomposed">
 
 
-    <link rel="icon" href="<?php echo get_template_directory_uri(); ?>/images/favicon.ico">
+    <link rel="icon" href="<?= wp_get_attachment_url($settings->favicon); ?>">
 
     <!-- See https://goo.gl/OOhYW5 -->
     <link rel="manifest" href="<?php echo get_template_directory_uri(); ?>/manifest.json">
 
     <!-- See https://goo.gl/qRE0vM -->
-    <meta name="theme-color" content="#3f51b5">
+    <meta name="theme-color" content="<?= $settings->themeColor; ?>">
 
     <!-- Add to homescreen for Chrome on Android. Fallback for manifest.json -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -53,19 +55,20 @@
     <meta name="apple-mobile-web-app-title" content="<?php echo get_option('blogname'); ?>">
 
     <!-- Homescreen icons -->
-    <link rel="apple-touch-icon" href="<?php echo get_template_directory_uri(); ?>/images/manifest/icon-48x48.png">
+    <link rel="apple-touch-icon"
+          href="<?= wp_get_attachment_url($settings->icon48); ?>">
     <link rel="apple-touch-icon" sizes="72x72"
-          href="<?php echo get_template_directory_uri(); ?>/images/manifest/icon-72x72.png">
+          href="<?= wp_get_attachment_url($settings->icon72); ?>">
     <link rel="apple-touch-icon" sizes="96x96"
-          href="<?php echo get_template_directory_uri(); ?>/images/manifest/icon-96x96.png">
+          href="<?= wp_get_attachment_url($settings->icon96); ?>">
     <link rel="apple-touch-icon" sizes="144x144"
-          href="<?php echo get_template_directory_uri(); ?>/images/manifest/icon-144x144.png">
+          href="<?= wp_get_attachment_url($settings->icon144); ?>">
     <link rel="apple-touch-icon" sizes="192x192"
-          href="<?php echo get_template_directory_uri(); ?>/images/manifest/icon-192x192.png">
+          href="<?= wp_get_attachment_url($settings->icon192); ?>">
 
     <!-- Tile icon for Windows 8 (144x144 + tile color) -->
     <meta name="msapplication-TileImage"
-          content="<?php echo get_template_directory_uri(); ?>/images/manifest/icon-144x144.png">
+          content="<?= wp_get_attachment_url($settings->icon144); ?>">
     <meta name="msapplication-TileColor" content="<?= $settings->themeColor ?>">
     <meta name="msapplication-tap-highlight" content="no">
 
@@ -127,7 +130,6 @@
             background-color: #eeeeee;
         }
     </style>
-
 
 </head>
 <body <?php body_class(); ?>>

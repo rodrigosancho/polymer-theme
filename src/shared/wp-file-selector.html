@@ -17,27 +17,34 @@
                 font-weight: 400;
                 line-height: 24px;
                 color: #737373;
+                width: 100%;
+            }
+
+            :host label{
+                @apply(--wp-file-selector-label);
             }
 
             :host span {
                 margin: 0 5px;
                 text-align: center;
                 line-height: 15px;
+                @apply(--wp-file-selector-message);
             }
 
-            :host div {
+            :host div#preview {
                 border: 2px dotted #737373;
                 border-radius: 50%;
                 background-image: var(--wp-file-selector-url);
                 background-color: #eee;
                 background-position: center;
                 background-size: cover;
-                height: 100px;
-                width: 100px;
                 overflow: hidden;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
+                height: var(--wp-file-selector-preview-height, 100px);
+                width: var(--wp-file-selector-preview-width, 100px);
+                @apply(--wp-file-selector-preview);
             }
 
             :host iron-icon {
@@ -82,23 +89,35 @@
                 '_updateId(attachment.id)'
             ],
 
+
             attached: function () {
-                //TODO Check if the wp library is loaded
+                this._status = "loading";
+                this._checkIfWpIsLoaded(1);
+            },
+
+            _checkIfWpIsLoaded: function(times){
+                if(typeof wp != 'undefined'){
+                    this.init(wp);
+                }else if(times < 50){
+                    setTimeout(function(){
+                        this._checkIfWpIsLoaded(times++);
+                    }.bind(this), 100);
+                }
+            },
+
+            init: function (wp) {
                 if (typeof this.fileId != 'undefined' && typeof this.attachment == 'undefined') {
-                    this._status = "loading";
-                    setTimeout(function () {
-                        //Fetch attachment information
-                        var attachment = wp.media.attachment(this.fileId);
-                        attachment.fetch()
+                    //Fetch attachment information
+                    var attachment = wp.media.attachment(this.fileId);
+                    attachment.fetch()
                             .then(function () {
                                 if (attachment) {
                                     this.attachment = attachment.attributes;
                                     this._status = "loaded";
-                                }else{
+                                } else {
                                     this._status = "empty";
                                 }
                             }.bind(this));
-                    }.bind(this), 1000);
                 } else if (typeof this.fileId == 'undefined' && typeof this.attachment == 'undefined') {
                     this._status = "empty"
                 } else {
@@ -116,7 +135,7 @@
                 }
                 // Create the media frame.
                 this.file_frame = wp.media.frames.file_frame = wp.media({
-                    title: 'Select a image to upload',
+                    title: this.label,
                     button: {
                         text: 'Use this image'
                     },
@@ -150,7 +169,7 @@
                     this.set('fileId', id);
             },
 
-            _showIf: function(currentStatus, desiredStatus){
+            _showIf: function (currentStatus, desiredStatus) {
                 return currentStatus === desiredStatus;
             }
         });
