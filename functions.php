@@ -560,6 +560,8 @@ function create_polymer_theme_view()
         );
     }, $query->posts);
 
+    //Enqueues all scripts, styles, settings, and templates necessary to use all media JavaScript APIs.
+    wp_enqueue_media();
     ?>
     <polymer-theme-admin-shell url="<?= get_admin_url() . 'admin-ajax.php'; ?>"
                                options-name='polymer-theme-options'

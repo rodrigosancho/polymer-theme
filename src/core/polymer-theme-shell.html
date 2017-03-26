@@ -14,6 +14,8 @@
 
 <link rel="import" href="../shared/polymer-theme-icons.html">
 
+<link rel="import" href="../../bower_components/uniflow-polymer/application-state.html">
+<link rel="import" href="polymer-theme-service.html">
 <link rel="import" href="polymer-theme-router.html">
 
 <dom-module id="polymer-theme-shell">
@@ -77,12 +79,11 @@
         <!-- Application Variables -->
         <global-variable key="offline" value="{{ offline }}"></global-variable>
         <global-variable key="siteTitle" value="{{ siteTitle }}"></global-variable>
-        <global-variable key="frontPage" value="{{ frontPage }}"></global-variable>
         <global-variable key="taxonomy" value="{{ taxonomy }}"></global-variable>
         <global-variable key="slug" value="{{ slug }}"></global-variable>
         <global-variable key="alias" value="{{ alias }}"></global-variable>
 
-        <app-location route="{{route}}"></app-location>
+        <app-location route="{{ route }}"></app-location>
         <polymer-theme-router route="[[ route ]]"
                               on-found-next="_changePage"></polymer-theme-router>
 
@@ -152,15 +153,17 @@
                     computed: '_getMenu(menus)'
                 },
 
-                templates: Object,
-
-                state: Object
+                templates: Object
             },
 
             listeners: {
                 'update-head': '_onUpdateHead',
                 'move-scroll': '_onMoveScroll'
             },
+
+            behaviors: [
+                UniFlow.ApplicationState
+            ],
 
             created: function () {
                 window.performance && performance.mark && performance.mark('polymer-theme.created');
@@ -227,7 +230,7 @@
 
             _onUpdateHead: function (event) {
                 var metas = event.detail,
-                    docMetas = document.querySelectorAll('meta');
+                        docMetas = document.querySelectorAll('meta');
 
                 try {
                     document.title = metas.title;

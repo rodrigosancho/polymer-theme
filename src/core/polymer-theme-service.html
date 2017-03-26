@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/global-variable/global-variable.html">
+<!--<link rel="import" href="../../bower_components/global-variable/global-variable.html">-->
+<link rel="import" href="../../bower_components/uniflow-polymer/state-aware.html">
+
 
 <dom-module id="polymer-theme-service">
     <template>
@@ -10,8 +12,8 @@
         </style>
 
         <!-- Application Variables -->
-        <global-variable key="siteUrl" value="{{ siteUrl }}"></global-variable>
-        <global-variable key="offline" value="{{ offline }}"></global-variable>
+        <!--<global-variable key="siteUrl" value="{{ siteUrl }}"></global-variable>-->
+        <!--<global-variable key="offline" value="{{ offline }}"></global-variable>-->
 
     </template>
     <script>
@@ -33,6 +35,19 @@
                     notify: true,
                     reflectToAttribute: true
                 }
+            },
+
+            behaviors: [
+                UniFlow.StateAware
+            ],
+
+            ready: function(){
+                console.log("hola");
+            },
+
+            attached: function(){
+                console.log("hola");
+                console.log(this.state);
             },
 
             _onLoading: function (loading) {
@@ -78,11 +93,11 @@
                 return url;
             },
 
-            _get: function (endPoint, event, params) {
+            getRequest: function (endPoint, event, params) {
 
                 this._onLoading(true);
 
-                var url = this._mountUrl(this.siteUrl, this.api, endPoint, params);
+                var url = this._mountUrl(this.state.siteUrl, this.api, endPoint, params);
 
                 //Fetching the information
                 fetch(url)
@@ -107,11 +122,11 @@
                     page: page || 1
                 };
 
-                this._get('posts', 'posts-received', params);
+                this.getRequest('posts', 'posts-received', params);
             },
 
             getPostByID: function (id) {
-                this._get('posts/' + id, 'post-received');
+                this.getRequest('posts/' + id, 'post-received');
             },
 
             getPostBySlug: function (slug) {
@@ -119,7 +134,7 @@
                     slug: slug
                 };
 
-                this._get('posts', 'post-received', params);
+                this.getRequest('posts', 'post-received', params);
             },
 
             getPages: function () {
@@ -129,11 +144,11 @@
                     }
                 };
 
-                this._get('pages', 'pages-received', params)
+                this.getRequest('pages', 'pages-received', params)
             },
 
             getPageByID: function (id) {
-                this._get('pages/' + id, 'page-received');
+                this.getRequest('pages/' + id, 'page-received');
             },
 
             getPageBySlug: function (slug) {
@@ -141,7 +156,7 @@
                     slug: slug
                 };
 
-                this._get('pages', 'page-received', params);
+                this.getRequest('pages', 'page-received', params);
             }
         });
     </script>

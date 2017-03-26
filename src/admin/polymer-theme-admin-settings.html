@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 
+<link rel="import" href="../shared/wp-file-selector.html">
 
 <dom-module id="polymer-theme-admin-settings">
     <template>
@@ -16,12 +17,10 @@
         <form id="form"
               is="iron-form"
               class="general-form">
-            <paper-input label="Favicon"
-                         value="{{ options.favicon }}">
-            </paper-input>
-            <paper-input label="Base url"
-                         value="{{ options.baseUrl }}">
-            </paper-input>
+
+            <wp-file-selector label="Favicon"
+                              file-id="{{ options.favicon }}">
+            </wp-file-selector>
             <paper-input label="Theme color"
                          value="{{ options.themeColor }}">
             </paper-input>

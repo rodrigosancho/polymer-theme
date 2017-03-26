@@ -1,5 +1,6 @@
 <?php
     $options = get_option('polymer-theme_options');
+    $settings = $options->settings;
     $templates = $options->templates;
     $state = $options->state;
 ?>
@@ -65,7 +66,7 @@
     <!-- Tile icon for Windows 8 (144x144 + tile color) -->
     <meta name="msapplication-TileImage"
           content="<?php echo get_template_directory_uri(); ?>/images/manifest/icon-144x144.png">
-    <meta name="msapplication-TileColor" content="#3f51b5">
+    <meta name="msapplication-TileColor" content="<?= $settings->themeColor ?>">
     <meta name="msapplication-tap-highlight" content="no">
 
     <script>
@@ -133,7 +134,7 @@
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
-    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TJSXJ3C"
+    <iframe src="https://www.googletagmanager.com/ns.html?id=<?= $settings->analytics ?>"
             height="0" width="0" style="display:none;visibility:hidden"></iframe>
 </noscript>
 <!-- End Google Tag Manager (noscript) -->
