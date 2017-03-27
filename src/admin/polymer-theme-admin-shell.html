@@ -12,6 +12,7 @@
 
 <link rel="import" href="polymer-theme-admin-settings.html">
 <link rel="import" href="polymer-theme-admin-templates.html">
+<link rel="import" href="polymer-theme-admin-state.html">
 
 <link rel="import" href="../shared/shared-styles.html">
 
@@ -56,6 +57,7 @@
                 <paper-tabs selected="{{ view }}" sticky>
                     <paper-tab>General Settings</paper-tab>
                     <paper-tab>Templates</paper-tab>
+                    <paper-tab>State</paper-tab>
                 </paper-tabs>
             </app-header>
 
@@ -85,6 +87,11 @@
                                                    templates="[[ templates ]]"
                                                    posts="[[ posts ]]">
                     </polymer-theme-admin-templates>
+                    <!-- State -->
+                    <polymer-theme-admin-state class="page"
+                                               language="[[ language]]"
+                                               options="{{ options.state }}">
+                    </polymer-theme-admin-state>
                 </iron-pages>
 
                 <paper-button id="save"
@@ -107,13 +114,7 @@
                 /** Name of the theme's options */
                 optionsName: String,
                 /** Options values */
-                options: {
-                    type: Object,
-                    value: {
-                        settings: {},
-                        templates: {}
-                    }
-                },
+                options: Object,
                 getName: {
                     type: 'Function',
                     computed: '_getName(optionsName)'

@@ -1,0 +1,164 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+
+<dom-module id="polymer-theme-admin-state">
+    <template>
+        <style>
+            :host {
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
+                display: block;
+            }
+
+            :host .add-row paper-input {
+                width: 43%;
+                display: inline-block;
+                float: left;
+                margin: 0 1%;
+            }
+
+            :host .add-row paper-icon-button {
+                margin-top: 16px;
+            }
+
+            ::content table {
+                width: 100%;
+                border-spacing: 0;
+                margin-top: 40px;
+            }
+
+            ::content table th {
+                padding: 10px 0;
+                text-align: left;
+                border-bottom: 2px solid #ddd;
+                width: 40%;
+            }
+
+            ::content table th:last-child {
+                width: 20%;
+            }
+
+            ::content table td {
+                border-bottom: 1px solid #ddd;
+            }
+        </style>
+
+        <h2>Application state paths</h2>
+        <div>
+            <paper-input label="Site url"
+                         value="{{ options.siteurl }}"
+                         required
+                         error-message="You must complete this field"></paper-input>
+        </div>
+        <h2>Custom state paths</h2>
+        <div class="add-row">
+            <form id="form"
+                  is="iron-form">
+                <paper-input label="Path"
+                             value="{{ _path }}"
+                             required
+                             error-message="You must complete this field"></paper-input>
+                <paper-input label="Value"
+                             value="{{ _value }}"
+                             required
+                             error-message="You must complete this field"></paper-input>
+                <paper-icon-button icon="add" on-click="_add"></paper-icon-button>
+            </form>
+        </div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Path</th>
+                <th>Value</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <template is="dom-repeat"
+                      items="[[ _paths ]]"
+                      as="path">
+                <tr>
+                    <td>[[ path ]]</td>
+                    <td>[[ _getValue(path, options.custom) ]]</td>
+                    <td>
+                        <paper-icon-button icon="delete"
+                                           on-click="_delete">
+                        </paper-icon-button>
+                    </td>
+                </tr>
+            </template>
+            </tbody>
+        </table>
+    </template>
+    <script>
+        Polymer({
+            is: 'polymer-theme-admin-state',
+            properties: {
+                /** Templates config object */
+                options: {
+                    type: Object,
+                    value: function(){
+                        return {
+                            custom: []
+                        }
+                    }
+                },
+                _path: {
+                    type: String,
+                    value: ""
+                },
+                _value: {
+                    type: String,
+                    value: ""
+                },
+                _paths: {
+                    type: Array,
+                    computed: '_getKeys(options.custom.*)'
+                }
+            },
+
+            _add: function () {
+                if (!this.$.form.validate()) return;
+
+                //Checking if there is not repeated
+                if (typeof this.options.custom[this._path] === 'undefined') {
+                    this.set('options.custom.' + this._path, this._value);
+                    //Resetting selects
+                    this._value = null;
+                    this._path = null;
+                } else {
+                    this.fire('notify', {
+                        message: "There's already a value for this path"
+                    });
+                }
+            },
+
+            _delete: function (event) {
+                var path = event.model.path,
+                    options = {};
+
+                if (typeof this.get('options.custom.' + path) !== 'undefined') {
+                    for (var property in this.options.custom) {
+                        if (this.options.custom.hasOwnProperty(property) && property != path) {
+                            options[property] = this.options.custom[property];
+                        }
+                    }
+
+                    this.set('options.custom', options);
+                }
+            },
+
+            _getKeys: function (object) {
+                return (object.base) ? Object.keys(object.base) : [];
+            },
+
+            _getValue: function (key, object) {
+                return object[key];
+            }
+        })
+    </script>
+</dom-module>
