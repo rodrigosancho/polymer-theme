@@ -17,6 +17,10 @@
                     title: '404 Page not found',
                     description: '404 Page not found'
                 });
+                this.fire('move-scroll', {
+                    x: 0,
+                    y: 0
+                });
                 this.fire('ready');
             }
         });

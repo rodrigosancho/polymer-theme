@@ -63,6 +63,10 @@
 
             _onPostsReceived: function (event) {
                 this.set('posts', event.detail.response);
+                this.fire('move-scroll', {
+                    x: 0,
+                    y: 0
+                });
                 this.fire('ready');
             }
         });

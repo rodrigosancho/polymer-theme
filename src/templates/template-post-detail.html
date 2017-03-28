@@ -11,14 +11,6 @@
             }
         </style>
 
-        <global-variable id="slug"
-                         key="slug"></global-variable>
-
-        <polymer-theme-service id="service"
-                               on-post-received="_onPostReceived"
-                               loading="{{ loading }}">
-        </polymer-theme-service>
-
         <div class="card">
             <template is="dom-if"
                       if="{{ item.thumbnail }}">
@@ -36,21 +28,9 @@
     <script>
         Polymer({
             is: 'template-post-detail',
-            properties: {
-                loading: {
-                    type: Boolean,
-                    reflectToAttribute: true
-                },
-                item: {
-                    type: Object,
-                    value: {}
-                }
-            },
 
             init: function (item) {
-
                 this.set('item', item);
-
                 this.fire('move-scroll', {
                     x: 0,
                     y: 0

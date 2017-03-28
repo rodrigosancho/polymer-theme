@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../../bower_components/global-variable/global-variable.html">
+<link rel="import" href="../../bower_components/uniflow-polymer/state-aware.html">
 
 <dom-module id="polymer-theme-router">
     <template>
@@ -10,8 +10,6 @@
                 display: none;
             }
         </style>
-        <global-variable key="siteUrl" value="{{ siteUrl }}"></global-variable>
-        <global-variable key="offline" value="{{ offline }}"></global-variable>
 
         <iron-ajax id="ajax"
                    loading="[[ loading ]]"
@@ -33,14 +31,18 @@
 
                 _url: {
                     type: String,
-                    computed: '_mountUrl(siteUrl, endPoint)'
+                    computed: '_mountUrl(state.siteurl, endPoint)'
                 },
 
                 _params: {
                     type: Object,
-                    computed: '_mountParams(siteUrl, route)'
+                    computed: '_mountParams(state.siteurl, route)'
                 }
             },
+
+            behaviors: [
+                UniFlow.StateAware
+            ],
 
             observers: [
                 '_makeRequest(_url, _params)'
@@ -63,7 +65,7 @@
             },
 
             _makeRequest: function(_url, _params){
-                if(!this.offline){
+                if(!this.state.offline){
                     this.$.ajax.url = _url;
                     this.$.ajax.params = _params;
                     this.$.ajax.generateRequest();

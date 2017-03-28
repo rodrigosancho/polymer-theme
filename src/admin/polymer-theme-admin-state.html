@@ -4,6 +4,8 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 
+<link rel="import" href="../shared/polymer-theme-icons.html">
+
 
 <dom-module id="polymer-theme-admin-state">
     <template>
@@ -49,7 +51,7 @@
 
         <h2>Application state paths</h2>
         <div>
-            <paper-input label="Site url"
+            <paper-input label="Site url *"
                          value="{{ options.siteurl }}"
                          required
                          error-message="You must complete this field"></paper-input>
@@ -99,14 +101,7 @@
             is: 'polymer-theme-admin-state',
             properties: {
                 /** Templates config object */
-                options: {
-                    type: Object,
-                    value: function(){
-                        return {
-                            custom: []
-                        }
-                    }
-                },
+                options: Object,
                 _path: {
                     type: String,
                     value: ""

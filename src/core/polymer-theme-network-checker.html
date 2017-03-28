@@ -1,0 +1,36 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/uniflow-polymer/state-mutator.html">
+
+<dom-module id="polymer-theme-network-checker">
+    <template>
+        <style>
+            :host{
+                display: none;
+            }
+        </style>
+    </template>
+    <script>
+        Polymer({
+            is: 'polymer-theme-network-checker',
+
+            behaviors: [
+                UniFlow.StateMutator
+            ],
+
+            ready: function () {
+                // listen for online/offline
+                Polymer.RenderStatus.afterNextRender(this, function () {
+                    this.listen(window, 'online', '_updateNetworkStatus');
+                    this.listen(window, 'offline', '_updateNetworkStatus');
+                    //Setting the value for the very first time
+                    this._updateNetworkStatus();
+                });
+            },
+
+            _updateNetworkStatus: function () {
+                this.set('state.offline', !navigator.onLine);
+           }
+        });
+    </script>
+</dom-module>

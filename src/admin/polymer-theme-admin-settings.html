@@ -16,46 +16,10 @@
                 display: block;
                 overflow: auto;
             }
-            :host .app-icons wp-file-selector{
+            :host wp-file-selector{
                 display: inline-block;
                 float: left;
                 margin: 10px;
-            }
-
-            :host wp-file-selector.size48 {
-                --wp-file-selector-preview: {
-                    height: 48px;
-                    width: 48px;
-                };
-
-                --wp-file-selector-message: {
-                    font-size: 10px;
-                    line-height: 10px;
-                }
-            }
-            :host wp-file-selector.size72 {
-                --wp-file-selector-preview: {
-                    height: 72px;
-                    width: 72px;
-                }
-            }
-            :host wp-file-selector.size96 {
-                --wp-file-selector-preview: {
-                    height: 96px;
-                    width: 96px;
-                }
-            }
-            :host wp-file-selector.size144 {
-                --wp-file-selector-preview: {
-                    height: 144px;
-                    width: 144px;
-                }
-            }
-            :host wp-file-selector.size192 {
-                --wp-file-selector-preview: {
-                    height: 192px;
-                    width: 192px;
-                }
             }
         </style>
 
@@ -64,28 +28,23 @@
               is="iron-form"
               class="general-form">
 
-            <wp-file-selector label="Favicon"
-                              file-id="{{ options.favicon }}">
-            </wp-file-selector>
             <div class="app-icons">
+                <wp-file-selector label="Favicon"
+                                  file-id="{{ options.favicon }}">
+                </wp-file-selector>
                 <wp-file-selector label="Icon 48x48"
-                                  class="size48"
                                   file-id="{{ options.icon48 }}">
                 </wp-file-selector>
                 <wp-file-selector label="Icon 72x72"
-                                  class="size72"
                                   file-id="{{ options.icon72 }}">
                 </wp-file-selector>
                 <wp-file-selector label="Icon 96x96"
-                                  class="size96"
                                   file-id="{{ options.icon96 }}">
                 </wp-file-selector>
                 <wp-file-selector label="Icon 144x144"
-                                  class="size144"
                                   file-id="{{ options.icon144 }}">
                 </wp-file-selector>
                 <wp-file-selector label="Icon 192x192"
-                                  class="size192"
                                   file-id="{{ options.icon192 }}">
                 </wp-file-selector>
             </div>

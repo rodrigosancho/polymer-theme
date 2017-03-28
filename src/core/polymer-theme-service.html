@@ -1,7 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<!--<link rel="import" href="../../bower_components/global-variable/global-variable.html">-->
 <link rel="import" href="../../bower_components/uniflow-polymer/state-aware.html">
-
 
 <dom-module id="polymer-theme-service">
     <template>
@@ -10,11 +8,6 @@
                 display: none;
             }
         </style>
-
-        <!-- Application Variables -->
-        <!--<global-variable key="siteUrl" value="{{ siteUrl }}"></global-variable>-->
-        <!--<global-variable key="offline" value="{{ offline }}"></global-variable>-->
-
     </template>
     <script>
         Polymer({
@@ -40,15 +33,6 @@
             behaviors: [
                 UniFlow.StateAware
             ],
-
-            ready: function(){
-                console.log("hola");
-            },
-
-            attached: function(){
-                console.log("hola");
-                console.log(this.state);
-            },
 
             _onLoading: function (loading) {
                 this.loading = loading;

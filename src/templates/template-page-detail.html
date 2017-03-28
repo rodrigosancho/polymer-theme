@@ -29,21 +29,8 @@
         Polymer({
             is: 'template-page-detail',
 
-            properties: {
-                loading: {
-                    type: Boolean,
-                    reflectToAttribute: true
-                },
-                page: {
-                    type: Object,
-                    value: {}
-                }
-            },
-
             init: function (item) {
-
                 this.set('item', item);
-
                 this.fire('move-scroll', {
                     x: 0,
                     y: 0

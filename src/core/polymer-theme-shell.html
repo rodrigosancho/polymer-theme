@@ -10,13 +10,13 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/app-layout/app-scrollpos-control/app-scrollpos-control.html">
-<link rel="import" href="../../bower_components/global-variable/global-variable.html">
+<link rel="import" href="../../bower_components/uniflow-polymer/application-state.html">
 
 <link rel="import" href="../shared/polymer-theme-icons.html">
 
-<link rel="import" href="../../bower_components/uniflow-polymer/application-state.html">
 <link rel="import" href="polymer-theme-service.html">
 <link rel="import" href="polymer-theme-router.html">
+<link rel="import" href="polymer-theme-network-checker.html">
 
 <dom-module id="polymer-theme-shell">
     <template>
@@ -76,13 +76,9 @@
             }
         </style>
 
-        <!-- Application Variables -->
-        <global-variable key="offline" value="{{ offline }}"></global-variable>
-        <global-variable key="siteTitle" value="{{ siteTitle }}"></global-variable>
-        <global-variable key="taxonomy" value="{{ taxonomy }}"></global-variable>
-        <global-variable key="slug" value="{{ slug }}"></global-variable>
-        <global-variable key="alias" value="{{ alias }}"></global-variable>
-
+        <!-- Network checker -->
+        <polymer-theme-network-checker></polymer-theme-network-checker>
+        <!-- App router -->
         <app-location route="{{ route }}"></app-location>
         <polymer-theme-router route="[[ route ]]"
                               on-found-next="_changePage"></polymer-theme-router>
@@ -166,21 +162,8 @@
             ],
 
             created: function () {
-                window.performance && performance.mark && performance.mark('polymer-theme.created');
                 // Custom elements polyfill safe way to indicate an element has been upgraded.
                 this.removeAttribute('unresolved');
-            },
-
-            ready: function () {
-                // listen for online/offline
-                Polymer.RenderStatus.afterNextRender(this, function () {
-                    this.listen(window, 'online', '_updateNetworkStatus');
-                    this.listen(window, 'offline', '_updateNetworkStatus');
-                });
-            },
-
-            _updateNetworkStatus: function () {
-                this.offline = !navigator.onLine;
             },
 
             _changePage: function (event) {
