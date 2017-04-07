@@ -15,6 +15,10 @@
                 display: block;
                 padding: 10px;
             }
+            
+            :host .card {
+                cursor: pointer;
+            }
         </style>
 
         <polymer-theme-service id="service"
@@ -25,7 +29,8 @@
         <template is="dom-repeat"
                   items="{{ posts }}"
                   as="post">
-            <div class="card">
+            <div class="card"
+                 on-click="_openPost">
                 <template is="dom-if"
                           if="{{ post.thumbnail }}">
                     <div class="image">
@@ -64,6 +69,11 @@
             _onPostsReceived: function (event) {
                 this.set('posts', event.detail.response);
                 this.fire('ready');
+            },
+
+            _openPost: function(event){
+                var post = event.model.post;
+                location.href = post.link;
             }
         });
     </script>

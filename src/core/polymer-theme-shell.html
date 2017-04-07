@@ -193,10 +193,6 @@
                     this._closeMenu();
                     view.removeEventListener('ready', _onReady);
                     this.template = template;
-                    //Notifying to Google Analytics the new route
-                    if(ga){
-                        ga('send', 'pageview', location.pathname);
-                    }
                 }.bind(this);
 
                 var view = this.$.pages.querySelector(template);
