@@ -195,8 +195,7 @@
                     this.template = template;
                     //Notifying to Google Analytics the new route
                     if(ga){
-                        ga('set', 'page', item.slug);
-                        ga('send', 'pageview');
+                        ga('send', 'location', location.pathname);
                     }
                 }.bind(this);
 
