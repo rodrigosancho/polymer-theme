@@ -193,11 +193,15 @@
                     this._closeMenu();
                     view.removeEventListener('ready', _onReady);
                     this.template = template;
+                    //Notifying to Google Analytics the new route
+                    if(ga){
+                        ga('set', 'page', item.slug);
+                        ga('send', 'pageview');
+                    }
                 }.bind(this);
 
                 var view = this.$.pages.querySelector(template);
                 //Adding template if necessary
-
 
                 if (!view) {
                     view = document.createElement(template);
@@ -212,7 +216,7 @@
 
             _onUpdateHead: function (event) {
                 var metas = event.detail,
-                        docMetas = document.querySelectorAll('meta');
+                    docMetas = document.querySelectorAll('meta');
 
                 try {
                     document.title = metas.title;
@@ -230,13 +234,14 @@
             },
 
             _showPage404: function () {
-                var templateFile = 'template-404.html',
-                        templateFileUrl = this.resolveUrl('../templates/' + templateFile);
-                this.importHref(templateFileUrl,
-                        function () {
-                            this._setView(templateFile.replace('.html', ''));
-                        },
-                        null, true);
+//                var templateFile = 'template-404.html',
+//                        templateFileUrl = this.resolveUrl('../templates/' + templateFile);
+//                this.importHref(templateFileUrl,
+//                        function () {
+//                            this._setView(templateFile.replace('.html', ''));
+//                        },
+//                        null, true);
+                location.href = this.state.siteUrl + '/404'
             },
 
             _closeMenu: function () {

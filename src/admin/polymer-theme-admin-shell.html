@@ -22,6 +22,7 @@
             :host {
                 --app-primary-color: #4285f4;
                 --app-secondary-color: black;
+                --app-error-color: firebrick;
                 display: block;
             }
 
@@ -34,14 +35,21 @@
                 overflow: auto;
             }
 
-            :host app-header, :host #save {
+            :host app-header, :host #save, :host #delete {
                 color: #fff;
                 background-color: var(--app-primary-color);
             }
 
-            :host #save {
+            :host #save, :host #delete {
                 float: right;
-                margin: 20px;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                margin-right: 20px;
+            }
+
+            :host #delete {
+
+                background-color: var(--app-error-color);
             }
 
             :host app-header paper-icon-button {
@@ -94,6 +102,9 @@
                     </polymer-theme-admin-state>
                 </iron-pages>
 
+
+                <paper-button id="delete"
+                              on-click="_delete">Delete</paper-button>
                 <paper-button id="save"
                               on-click="_submit"
                               disabled$="[[ saving ]]">Save</paper-button>
@@ -159,13 +170,32 @@
                 }.bind(this));
 
                 if(validated)
+                    this.set('action', 'update_polymer-theme_options');
+                    this.async(function(){
+                        this.$.ajax.generateRequest();
+                    });
+            },
+
+            _delete: function(){
+                this.set('action', 'delete_polymer-theme_options');
+                this.async(function(){
                     this.$.ajax.generateRequest();
+                });
             },
 
             _onResponse : function(){
-                this.fire('notify', {
-                    message: "Options saved!"
-                });
+
+                var action = this.get('action');
+
+                if(action == 'update_polymer-theme_options'){
+                    this.fire('notify', {
+                        message: "Options saved!"
+                    });
+                }else if(action == 'delete_polymer-theme_options'){
+                    location.reload();
+                }
+
+
             },
 
             _onNotify: function(event){
