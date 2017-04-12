@@ -1,51 +1,54 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
 
-
-<link rel="import" href="../core/polymer-theme-service.html">
 <link rel="import" href="../shared/echo-html.html">
 <link rel="import" href="../shared/polymer-theme-icons.html">
-
 <link rel="import" href="../shared/shared-styles.html">
 
 <dom-module id="template-blog">
     <template>
         <style include="shared-styles">
             :host {
-                display: block;
-                padding: 10px;
+                height: calc(100vh - 64px);
+                display: flex;
+                flex-direction: column;
             }
-            
+
             :host .card {
                 cursor: pointer;
             }
+
+            :host .card a {
+                text-decoration: none;
+                color: #757575;
+            }
+
         </style>
-
-        <polymer-theme-service id="service"
-                               loading="{{ loading }}"
-                               on-posts-received="_onPostsReceived">
-        </polymer-theme-service>
-
-        <template is="dom-repeat"
-                  items="{{ posts }}"
-                  as="post">
-            <div class="card"
-                 on-click="_openPost">
-                <template is="dom-if"
-                          if="{{ post.thumbnail }}">
-                    <div class="image">
-                        <img src="[[ post.thumbnail ]]" alt="[[ post.title.rendered ]]">
-                    </div>
-                </template>
-                <div class="content">
-                    <h2>[[ post.title.rendered ]]</h2>
-                    <echo-html html="{{ post.excerpt.rendered }}"></echo-html>
+        <iron-scroll-threshold lower-threshold="300"
+                               on-lower-threshold="_next"
+                               id="threshold">
+            <template is="dom-repeat"
+                      items="[[ posts ]]"
+                      as="post">
+                <div class="card">
+                    <a href$="[[ post.link ]]">
+                        <template is="dom-if"
+                                  if="{{ post.thumbnail }}">
+                            <div class="image">
+                                <img src="[[ post.thumbnail ]]" alt="[[ post.title.rendered ]]">
+                            </div>
+                        </template>
+                        <div class="content">
+                            <h2>[[ post.title.rendered ]]</h2>
+                            <echo-html html="{{ post.excerpt.rendered }}"></echo-html>
+                        </div>
+                    </a>
                 </div>
-            </div>
-        </template>
-
-
+            </template>
+        </iron-scroll-threshold>
     </template>
+
     <script>
         Polymer({
             is: 'template-blog',
@@ -58,22 +61,47 @@
                 posts: {
                     type: Array,
                     value: []
+                },
+                _paging: {
+                    type: Object,
+                    value: {}
                 }
             },
 
             init: function () {
-                //Fetching blog page information (seo)
-                this.$.service.getPosts();
+
+                this.set('posts', []);
+
+                wp.posts()
+                    .then(this._onReceived.bind(this))
+                    .catch(this._onError.bind(this));
             },
 
-            _onPostsReceived: function (event) {
-                this.set('posts', event.detail.response);
+            _next: function () {
+                if (this._paging && this._paging.next){
+                    this._paging.next
+                        .then(this._onReceived.bind(this))
+                        .catch(this._onError.bind(this));
+                }
+            },
+
+            _onReceived: function (data) {
+                //Adding new elements
+                data.forEach(function (item) {
+                    if (item != data._paging) {
+                        this.push('posts', item);
+                    }
+                }.bind(this));
+                // Clearing threshold
+                this.$.threshold.clearTriggers();
+                // Updating paging
+                this.set('_paging', data._paging);
+                // Notifying that everything is ready
                 this.fire('ready');
             },
 
-            _openPost: function(event){
-                var post = event.model.post;
-                location.href = post.link;
+            _onError: function (data) {
+                //TODO
             }
         });
     </script>

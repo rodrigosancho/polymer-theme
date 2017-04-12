@@ -194,6 +194,36 @@ function remove_admin_bar()
     return false;
 }
 
+// Custom View Article link to Post
+function html5_blank_view_article($more)
+{
+    global $post;
+    return '... <a class="view-article" href="' . get_permalink($post->ID) . '">' . __('View Article', 'polymer_theme') . '</a>';
+}
+
+/**
+ * Add the field "thumbnail" to REST API responses for posts and pages read
+ */
+
+add_action('rest_api_init', 'slug_register');
+
+function slug_register()
+{
+    register_rest_field(['post', 'page'],
+        'thumbnail',
+        array(
+            'get_callback' => 'slug_get_thumbnail',
+            'update_callback' => null,
+            'schema' => null,
+        )
+    );
+}
+
+function slug_get_thumbnail($object, $field_name, $request)
+{
+    return wp_get_attachment_url($object['featured_media']);
+}
+
 function polymer_theme_create_admin()
 {
     //create new top-level menu
@@ -317,5 +347,6 @@ remove_action('wp_head', 'rel_canonical');
 remove_action('wp_head', 'wp_shortlink_wp_head', 10, 0);
 
 // Add Filters
+add_filter('excerpt_more', 'html5_blank_view_article'); // Add 'View Article' button instead of [...] for Excerpts
 add_filter('show_admin_bar', 'remove_admin_bar'); // Remove Admin bar
 add_filter('style_loader_tag', 'import_html', 10, 3); //Replace the rel=stylesheet with rel=import

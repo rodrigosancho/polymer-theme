@@ -26,7 +26,11 @@
     "iron-icons": "^1.2.0",
     "iron-ajax": "^1.4.3",
     "paper-select": "trofrigo/paper-select",
-    "uniflow-polymer": "google/uniflow-polymer#^0.5.0"
+    "uniflow-polymer": "google/uniflow-polymer#^0.5.0",
+    "node-wpapi": "WP-API/node-wpapi#^1.0.3",
+    "requirejs": "^2.3.3",
+    "iron-list": "^1.4.5",
+    "iron-scroll-threshold": "PolymerElements/iron-scroll-threshold#^1.0.3"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

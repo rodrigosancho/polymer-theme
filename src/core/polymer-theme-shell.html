@@ -13,9 +13,6 @@
 <link rel="import" href="../../bower_components/uniflow-polymer/application-state.html">
 
 <link rel="import" href="../shared/polymer-theme-icons.html">
-
-<link rel="import" href="polymer-theme-service.html">
-<link rel="import" href="polymer-theme-router.html">
 <link rel="import" href="polymer-theme-network-checker.html">
 
 <dom-module id="polymer-theme-shell">
@@ -80,9 +77,6 @@
         <polymer-theme-network-checker></polymer-theme-network-checker>
         <!-- App router -->
         <app-location route="{{ route }}"></app-location>
-        <polymer-theme-router route="[[ route ]]"
-                              on-found-next="_changePage"></polymer-theme-router>
-
         <app-drawer-layout id="drawerLayout" fullbleed>
             <!-- Drawer content -->
             <app-drawer id="drawer"
@@ -125,10 +119,18 @@
                                selected="{{ template }}"></app-scrollpos-control>
     </template>
 
+    <script src="../wpapi/wpapi.min.js"></script>
+
     <script>
+
+        var wp = wp || new WPAPI({
+                    endpoint: 'http://wp.localhost/wp-json'
+                });
+        wp.search = wp.registerRoute('polymer-theme/v1', '/search');
+
+
         Polymer({
             is: 'polymer-theme-shell',
-
             properties: {
                 taxonomy: {
                     type: String,
@@ -148,7 +150,11 @@
                     computed: '_getMenu(menus)'
                 },
 
-                templates: Object
+                templates: Object,
+                route: {
+                    type: Object,
+                    observer: '_onRouteChanged'
+                }
             },
 
             listeners: {
@@ -165,11 +171,20 @@
                 this.removeAttribute('unresolved');
             },
 
-            _changePage: function (event) {
+            _onRouteChanged: function(route){
+                var url = this.state.siteurl + route.path;
+                wp.search().param('url', url)
+                    .then(function(items){
+                        this._changePage(items[0]);
+                    }.bind(this))
+                    .catch(function(){
+                        this._showPage404();
+                    }.bind(this));
+            },
 
-                this.taxonomy = event.detail.item.type;
-                this.slug = event.detail.item.slug;
-
+            _changePage: function (item) {
+                this.taxonomy = item.type;
+                this.slug = item.slug;
                 // Load page import on demand. Show 404 page if fails
                 var templateFile = (this.templates[this.slug])
                                 ? this.templates[this.slug]
@@ -178,13 +193,13 @@
 
                 this.importHref(templateFileUrl,
                         function () {
-                            this._setView(templateFile.replace('.html', ''), event.detail.item);
+                            this._setView(templateFile.replace('.html', ''), item);
                         },
                         this._showPage404, true);
             },
 
             _setView: function (template, item) {
-                var _onReady = function () {
+                var _onReady = function (event) {
                     //Updating head
                     if (item) {
                         this.fire('update-head', item.tags);
@@ -211,7 +226,7 @@
 
             _onUpdateHead: function (event) {
                 var metas = event.detail,
-                    docMetas = document.querySelectorAll('meta');
+                        docMetas = document.querySelectorAll('meta');
 
                 try {
                     document.title = metas.title;
@@ -252,4 +267,7 @@
             }
         });
     </script>
+
 </dom-module>
+
+

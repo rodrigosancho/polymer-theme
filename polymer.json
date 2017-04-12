@@ -12,7 +12,7 @@
    "bower.json"
   ],
   "includeDependencies": [
-    "manifest.json",
+    "bower_components/node-wpapi/wpapi.js",
     "bower_components/webcomponentsjs/webcomponents-lite.min.js"
   ]
 }

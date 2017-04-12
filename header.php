@@ -117,6 +117,7 @@ $state = $options->state;
         }
     </script>
 
+    <!--  Importing shell  -->
     <link rel="import" href="<?php echo get_template_directory_uri(); ?>/src/core/polymer-theme-shell.html">
 
     <style>
