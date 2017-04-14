@@ -5,6 +5,7 @@
 <link rel="import" href="../shared/echo-html.html">
 <link rel="import" href="../shared/polymer-theme-icons.html">
 <link rel="import" href="../shared/shared-styles.html">
+<link rel="import" href="../shared/wp-api.html">
 
 <dom-module id="template-blog">
     <template>
@@ -25,6 +26,10 @@
             }
 
         </style>
+
+        <!-- WP Api -->
+        <wp-api wp="{{ wp }}"></wp-api>
+
         <iron-scroll-threshold lower-threshold="300"
                                on-lower-threshold="_next"
                                id="threshold">
@@ -72,7 +77,7 @@
 
                 this.set('posts', []);
 
-                wp.posts()
+                this.wp.posts()
                     .then(this._onReceived.bind(this))
                     .catch(this._onError.bind(this));
             },

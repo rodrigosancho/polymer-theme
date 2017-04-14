@@ -13,6 +13,7 @@
 <link rel="import" href="../../bower_components/uniflow-polymer/application-state.html">
 
 <link rel="import" href="../shared/polymer-theme-icons.html">
+<link rel="import" href="../shared/wp-api.html">
 <link rel="import" href="polymer-theme-network-checker.html">
 
 <dom-module id="polymer-theme-shell">
@@ -73,6 +74,8 @@
             }
         </style>
 
+        <!-- WP Api -->
+        <wp-api wp="{{ wp }}"></wp-api>
         <!-- Network checker -->
         <polymer-theme-network-checker></polymer-theme-network-checker>
         <!-- App router -->
@@ -119,16 +122,7 @@
                                selected="{{ template }}"></app-scrollpos-control>
     </template>
 
-    <script src="../wpapi/wpapi.min.js"></script>
-
     <script>
-
-        var wp = wp || new WPAPI({
-                    endpoint: 'http://wp.localhost/wp-json'
-                });
-        wp.search = wp.registerRoute('polymer-theme/v1', '/search');
-
-
         Polymer({
             is: 'polymer-theme-shell',
             properties: {
@@ -152,10 +146,13 @@
 
                 templates: Object,
                 route: {
-                    type: Object,
-                    observer: '_onRouteChanged'
+                    type: Object
                 }
             },
+
+            observers: [
+                '_onRouteChanged(route, wp)'
+            ],
 
             listeners: {
                 'update-head': '_onUpdateHead',
@@ -171,7 +168,7 @@
                 this.removeAttribute('unresolved');
             },
 
-            _onRouteChanged: function(route){
+            _onRouteChanged: function(route, wp){
                 var url = this.state.siteurl + route.path;
                 wp.search().param('url', url)
                     .then(function(items){
@@ -244,14 +241,7 @@
             },
 
             _showPage404: function () {
-//                var templateFile = 'template-404.html',
-//                        templateFileUrl = this.resolveUrl('../templates/' + templateFile);
-//                this.importHref(templateFileUrl,
-//                        function () {
-//                            this._setView(templateFile.replace('.html', ''));
-//                        },
-//                        null, true);
-                location.href = this.state.siteUrl + '/404'
+                location.href = this.state.siteUrl + '/404';
             },
 
             _closeMenu: function () {

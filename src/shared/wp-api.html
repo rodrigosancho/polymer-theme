@@ -1,0 +1,54 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/uniflow-polymer/state-aware.html">
+
+<dom-module id="wp-api">
+    <template>
+        <style>
+            :host{
+                display: none;
+            }
+        </style>
+    </template>
+
+    <script src="../wpapi/wpapi.min.js"></script>
+
+    <script>
+        (function(){
+
+            var wp;
+
+            Polymer({
+                is: 'wp-api',
+
+                properties: {
+                    // Wordpress api library
+                    wp : {
+                        type: Object,
+                        notify: true
+                    }
+                },
+
+                behaviors: [
+                    UniFlow.StateAware
+                ],
+
+                observers: [
+                    'init(state)'
+                ],
+
+                init: function(state) {
+
+                    console.log(state.siteurl);
+
+                    wp = wp || new WPAPI({
+                        endpoint: state.siteurl + '/wp-json/'
+                    });
+
+                    wp.search = wp.search || wp.registerRoute('polymer-theme/v1', '/search');
+
+                    this.set('wp', wp);
+                }
+            });
+        })();
+    </script>
+</dom-module>
