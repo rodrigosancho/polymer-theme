@@ -2,3 +2,9 @@ bower_components/
 build/
 node_modules/
 .idea/
+
+src/templates/*
+!src/templates/template-blog.html
+!src/templates/template-page-detail.html
+!src/templates/template-post-detail.html
+
