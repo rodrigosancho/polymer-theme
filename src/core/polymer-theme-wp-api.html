@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/uniflow-polymer/state-aware.html">
 
-<dom-module id="wp-api">
+<dom-module id="polymer-theme-wp-api">
     <template>
         <style>
             :host{
@@ -10,7 +10,7 @@
         </style>
     </template>
 
-    <script src="../wpapi/wpapi.min.js"></script>
+    <script src="../../vendor/wpapi/wpapi.min.js"></script>
 
     <script>
         (function(){
@@ -18,7 +18,7 @@
             var wp;
 
             Polymer({
-                is: 'wp-api',
+                is: 'polymer-theme-wp-api',
 
                 properties: {
                     // Wordpress api library
@@ -37,8 +37,6 @@
                 ],
 
                 init: function(state) {
-
-                    console.log(state.siteurl);
 
                     wp = wp || new WPAPI({
                         endpoint: state.siteurl + '/wp-json/'

@@ -12,8 +12,8 @@
 <link rel="import" href="../../bower_components/app-layout/app-scrollpos-control/app-scrollpos-control.html">
 <link rel="import" href="../../bower_components/uniflow-polymer/application-state.html">
 
-<link rel="import" href="../shared/polymer-theme-icons.html">
-<link rel="import" href="../shared/wp-api.html">
+<link rel="import" href="polymer-theme-icons.html">
+<link rel="import" href="polymer-theme-route.html">
 <link rel="import" href="polymer-theme-network-checker.html">
 
 <dom-module id="polymer-theme-shell">
@@ -74,12 +74,12 @@
             }
         </style>
 
-        <!-- WP Api -->
-        <wp-api wp="{{ wp }}"></wp-api>
         <!-- Network checker -->
         <polymer-theme-network-checker></polymer-theme-network-checker>
         <!-- App router -->
         <app-location route="{{ route }}"></app-location>
+        <polymer-theme-route route="{{ route }}"
+                             data="{{ data }}"></polymer-theme-route>
         <app-drawer-layout id="drawerLayout" fullbleed>
             <!-- Drawer content -->
             <app-drawer id="drawer"
@@ -143,16 +143,13 @@
                     type: Function,
                     computed: '_getMenu(menus)'
                 },
-
                 templates: Object,
-                route: {
-                    type: Object
+                route: Object,
+                data: {
+                    type: Object,
+                    observer: '_changePage'
                 }
             },
-
-            observers: [
-                '_onRouteChanged(route, wp)'
-            ],
 
             listeners: {
                 'update-head': '_onUpdateHead',
@@ -168,20 +165,9 @@
                 this.removeAttribute('unresolved');
             },
 
-            _onRouteChanged: function(route, wp){
-                var url = this.state.siteurl + route.path;
-                wp.search().param('url', url)
-                    .then(function(items){
-                        this._changePage(items[0]);
-                    }.bind(this))
-                    .catch(function(){
-                        this._showPage404();
-                    }.bind(this));
-            },
-
-            _changePage: function (item) {
-                this.taxonomy = item.type;
-                this.slug = item.slug;
+            _changePage: function (data) {
+                this.taxonomy = data.type;
+                this.slug = data.slug;
                 // Load page import on demand. Show 404 page if fails
                 var templateFile = (this.templates[this.slug])
                                 ? this.templates[this.slug]
@@ -190,7 +176,7 @@
 
                 this.importHref(templateFileUrl,
                         function () {
-                            this._setView(templateFile.replace('.html', ''), item);
+                            this._setView(templateFile.replace('.html', ''), data);
                         },
                         this._showPage404, true);
             },

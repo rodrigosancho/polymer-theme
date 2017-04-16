@@ -1,0 +1,64 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/uniflow-polymer/state-aware.html">
+
+<link rel="import" href="polymer-theme-wp-api.html">
+
+<dom-module id="polymer-theme-route">
+    <template>
+        <style>
+            :host{
+                display: none;
+            }
+        </style>
+        <!-- WP Api -->
+        <polymer-theme-wp-api wp="{{ wp }}"></polymer-theme-wp-api>
+    </template>
+    <script>
+        Polymer({
+            is: 'polymer-theme-route',
+            properties : {
+                /** Route object */
+                route: Object,
+                wp: Object,
+                data: {
+                    type: Object,
+                    notify: true
+                },
+                loading: {
+                    type: Boolean,
+                    value: false
+                },
+                failure: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+
+            observers: [
+                '_onRouteChanged(route, wp, state)'
+            ],
+
+            behaviors: [
+                UniFlow.StateAware
+            ],
+
+            _onRouteChanged: function(route, wp, state){
+
+                var url = state.siteurl + route.path;
+
+                this.set('loading', true);
+
+                wp.search().param('url', url)
+                    .then(function(items){
+                        this.set('data', items[0]);
+                        this.set('failure', false);
+                        this.set('loading', false);
+                    }.bind(this))
+                    .catch(function(){
+                        this.set('failure', true);
+                        this.set('loading', false);
+                    }.bind(this));
+            },
+        });
+    </script>
+</dom-module>
