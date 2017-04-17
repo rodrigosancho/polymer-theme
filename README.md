@@ -6,28 +6,28 @@ This theme aims to be a starting point to develop a Polymer SPA applications usi
 
 It is still in development stage and some bugs may appear.
 
-* Installation
-    * Basic installation
-    * Advanced installation (Varnish and wp-editor)
-* File structure
-* Admin and configuration
-    * General Settings
-    * Templates
-    * State
-* Custom elements
-    * polymer-theme-shell
-    * polymer-theme-route
-    * polymer-theme-wp-api
-    * polymer-theme-network-checker
-    * polymer-theme-icons
-    * polymer-theme-shared-styles
-    * polymer-theme-html
-* Templates
-    * Understanding the templates
-    * Hierarchy
-    * template-blog
-    * template-page-detail
-    * template-post-detail
+* [Installation](#installation)
+    * [Basic installation](#basic-installation)
+    * [Advanced installation](#advanced-installation)
+* [File structure](#file-structure)
+* [Admin and configuration](#admin-and-configuration)
+    * [General Settings](#general-settings)
+    * [Templates](#templates)
+    * [State](#state)
+* [Custom elements](#custom-elements)
+    * [polymer-theme-shell](http://wp.trofrigo.me/elements/polymer-theme-shell)
+    * [polymer-theme-route](http://wp.trofrigo.me/elements/polymer-theme-route)
+    * [polymer-theme-wp-api](http://wp.trofrigo.me/elements/polymer-theme-wp-api)
+    * [polymer-theme-network-checker](http://wp.trofrigo.me/elements/polymer-theme-network-checker)
+    * [polymer-theme-icons](http://wp.trofrigo.me/elements/polymer-theme-icons)
+    * [polymer-theme-shared-styles](http://wp.trofrigo.me/elements/polymer-theme-shared-styles)
+    * [polymer-theme-html](http://wp.trofrigo.me/elements/polymer-theme-html)
+* [Templates](#templates)
+    * [Understanding the templates system](#understanding-the-templates-system)
+    * [Template hierarchy](#template-hierarchy)
+    * [template-blog](#template-blog)
+    * [template-page-detail](#templates-page-detail)
+    * [template-post-detail](#templates-post-detail)
 
 
 ## Installation
@@ -127,20 +127,66 @@ attribute of the application's state.
 
 
 ## Custom elements
-### polymer-theme-shell
-### polymer-theme-route
-### polymer-theme-wp-api
-### polymer-theme-network-checker
-### polymer-theme-icons
-### polymer-theme-shared-styles
-### polymer-theme-html
+### [polymer-theme-shell](http://wp.trofrigo.me/elements/polymer-theme-shell)
+### [polymer-theme-route](http://wp.trofrigo.me/elements/polymer-theme-route)
+### [polymer-theme-wp-api](http://wp.trofrigo.me/elements/polymer-theme-wp-api)
+### [polymer-theme-network-checker](http://wp.trofrigo.me/elements/polymer-theme-network-checker)
+### [polymer-theme-icons](http://wp.trofrigo.me/elements/polymer-theme-icons)
+### [polymer-theme-shared-styles](http://wp.trofrigo.me/elements/polymer-theme-shared-styles)
+### [polymer-theme-html](http://wp.trofrigo.me/elements/polymer-theme-html)
 
 ## Templates
+
 ### Understanding the templates system
-### Hierarchy
-### template-blog
-### template-page-detail
-### template-post-detail
+Every time the route changes, the [shell](http://wp.trofrigo.me/elements/polymer-theme-shell) tries to infer the most appropriate template.
+To do this, the shell fetch the information that Wordpress has for this url using the
+[polymer-theme-route](http://wp.trofrigo.me/elements/polymer-theme-route). This information is eventually passed to the template,
+that is the info that is typically into the [Wordpress's Loop](https://codex.wordpress.org/The_Loop).
+
+Once the template is selected, the shell call to an `init` method that the must implement that receives a param with the Loop's info.
+At this point, the shell waits to the template to fire a method called `ready`, that notifies that template is ready to be shown.
+
+In a simple example, a template receives the Loop info, bind it, and notifies that is ready to go.
+
+    Polymer({
+        is: 'post-detail',
+        init: function (item) {
+            this.set('item', item);
+            this.fire('ready');
+        }
+    });
+
+In a more complex example, a template that renders a page, may need to find all page's children. In this case the template needs
+to fetch this children information in order to be ready.
+
+    Polymer({
+        is: 'page-children',
+        init: function (item) {
+            this.wp.pages().param('parent', item.id)
+                .then(function (response) {
+                    this.set('children', response);
+                    this.fire('ready');
+                }.bind(this));
+        }
+    });
+
+Note in this last example, the templates uses the [polymer-theme-wp-api](http://wp.trofrigo.me/elements/polymer-theme-wp-api)
+to fetch this information.
+
+### Template hierarchy
+This theme tries to mimic the Wordpress template behaviour. Every time the route changes, theme's router will find
+what the `taxonomy` and the `slug` of the next view is. Once those params are determinated, the shell will try to find a
+template for the view.
+
+First of all will look for [custom rule](#templates) for this slug,
+if this rule does not exist, will resolve into `templates/template-{taxonomy}-detail.html`.
+
+This hierarchy allows the user to set a default view for a taxonomy detail (typically `post-detail` and `page-detail`)
+and also overwrite it for any special post, just creating a [new rule](#templates).
+
+### [template-blog](https://github.com/trofrigo/polymer-theme/blob/master/src/templates/template-blog.html)
+### [template-page-detail](https://github.com/trofrigo/polymer-theme/blob/master/src/templates/template-page-detail.html)
+### [template-post-detail](https://github.com/trofrigo/polymer-theme/blob/master/src/templates/template-post-detail.html)
 
 ## Changelog
 
