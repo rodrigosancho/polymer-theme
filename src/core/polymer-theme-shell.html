@@ -16,6 +16,81 @@
 <link rel="import" href="polymer-theme-route.html">
 <link rel="import" href="polymer-theme-network-checker.html">
 
+
+<!--
+
+polymer-theme-shell
+-------------------
+
+This element it's the minimal amount of HTML, CSS and Javascript needed to show a
+first representation of the application.
+
+It has the ability to infer the proper template depending on the URL.
+The shell fetch the information that Wordpress has for this url using the [polymer-theme-route](http://wp.trofrigo.me/elements/polymer-theme-route).
+This information is eventually passed to the template,
+that is the info that is typically into the [Wordpress's Loop](https://codex.wordpress.org/The_Loop).
+
+Once the template is selected, the shell call to an `init(item)` method that the template must implement. That method receives a param with the Loop's info.
+At this point, the shell waits to the template to fire a method called `ready`, that notifies that template is ready to be shown.
+
+In a simple example, a template receives the Loop info, bind it, and notifies that is ready to go.
+
+ ```javascript
+    Polymer({
+        is: 'post-detail',
+        init: function (item) {
+            this.set('item', item);
+            this.fire('ready');
+        }
+    });
+ ```
+
+In a more complex example, a template that renders a page may need to find all page's children. In this case the template needs
+to fetch this children information in order to be ready.
+
+ ```javascript
+    Polymer({
+        is: 'page-children',
+        init: function (item) {
+            this.wp.pages().param('parent', item.id)
+                .then(function (response) {
+                    this.set('children', response);
+                    this.fire('ready');
+                }.bind(this));
+        }
+    });
+ ```
+
+NOTE: in this last example, the templates uses the [polymer-theme-wp-api](http://wp.trofrigo.me/elements/polymer-theme-wp-api)
+to fetch this information.
+
+Apart from this template resolution, this shell is able to handle some events by any inner element. Those events are:
+
+`update-head`
+-------------
+ Firing this event, any inner element is able to update the tile and any `meta` tag inside the application's head.
+Example fired by an inner element:
+  ```javascript
+    this.fire('update-head', {
+        'title': 'Title',
+        'descriptions': 'Description text',
+        'theme-color': '#fff'
+    });
+   ```
+
+`move-scroll`
+-------------
+Firing this event, any inner element is to move the application scroll to given coordinate.
+Example fired by an inner element:
+  ```javascript
+    this.fire('move-scroll', {
+        x: 0,
+        y: 0
+    });
+   ```
+
+-->
+
 <dom-module id="polymer-theme-shell">
     <template>
         <style>
@@ -126,26 +201,32 @@
         Polymer({
             is: 'polymer-theme-shell',
             properties: {
-                /** Current's element taxonomy */
+                /** Current route taxonomy */
                 taxonomy: {
                     type: String,
                     reflectToAttribute: true
                 },
+                /** Current route slug */
                 slug: {
                     type: String,
                     reflectToAttribute: true
                 },
+                /** Current route template */
                 template: {
                     type: String,
                     reflectToAttribute: true
                 },
+                /** All the menus set in the Wordpress's backoffice */
                 menus: Object,
                 menu: {
                     type: Function,
                     computed: '_getMenu(menus)'
                 },
+                /** List of templates custom rules set in the Wordpress's backoffice */
                 templates: Object,
+                /** Current route */
                 route: Object,
+                /** Data for the current element, similar to Wordpress's Loop data */
                 data: {
                     type: Object,
                     observer: '_changePage'
@@ -210,7 +291,7 @@
 
             _onUpdateHead: function (event) {
                 var metas = event.detail,
-                        docMetas = document.querySelectorAll('meta');
+                    docMetas = document.querySelectorAll('meta');
 
                 try {
                     document.title = metas.title;

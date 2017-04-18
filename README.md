@@ -1,7 +1,8 @@
 # Polymer SPA Theme for Wordpress
 
 
-This theme aims to be a starting point to develop a Polymer SPA applications using Wordpress to feed it. It's based on the Polymer's team `Polymer starting Kit`.
+This theme aims to be a starting point to develop a Polymer SPA applications using Wordpress to feed it.
+It's based on the Polymer's team `Polymer starting Kit`.
 
 
 It is still in development stage and some bugs may appear.
@@ -40,12 +41,15 @@ It is still in development stage and some bugs may appear.
 * Install and activate this theme into your [Wordpress](https://wordpress.org) installation.
 * Create a page called Blog. This is needed in order to be able to edit the blog's title and description.
 
+NOTE: After the first installation, you may need go to the Polymer theme admin's
+application into the Wordpress backoffice and save this configuration for a very first time.
+
 If you are using a Wordpress installation previous to the 4.7.3 version, you have to install the
-[WP REST API](http://v2.wp-api.org/) as well.
+[WP REST API](http://v2.wp-api.org/) plugin as well.
 
 ### Advanced installation
 
-In order to improve the user final experience and daily blog's workflow, some plugings an third party software may  be
+In order to improve the user final experience and daily blog's workflow, some plugins and third party software may be
 installed.
 
 [Varnish](https://varnish-cache.org/) caches all the API requests, improving the speed transition between pages.
@@ -71,7 +75,7 @@ that you can reuse in your own [templates](#templates) or elements.
 
 ## Admin and configuration
 
-Once this theme is installed, you will find inside your Wordpress backoffice, a new option `polymer-theme`:
+Once this theme is installed, you will find inside your Wordpress backoffice a new option, `polymer-theme`:
 
 ![Backoffice admin options](images/backoffice-admin-options.PNG)
 
@@ -81,31 +85,31 @@ Inside this new page you will find 3 tabs:
 
 ### General Settings
 
-This first tab manages some general settings as for example:
+This first tab manages some general settings, as for example:
 
-* SPA icons. Allows you define several icons sizes.
+* SPA icons. Allows you to define several icons sizes.
 * Theme color. That's the color used for some browser to color its navbar.
 * Google Tag Manager. By default, this theme ships with Google Tag Manager ready to use.
 
 ### Templates
 
-Every time that this themes try to resolve a url, uses [some to rules](#understanding-the-templates-system) to infer a
-proper template. Those general rules can be overwritten for any page or post in your site.
+Every time that this theme try to resolve a url, uses [some to rules](#understanding-the-templates-system) to infer a
+proper template. Those general rules can be overwritten to any page or post in your site.
 
 ![Admin templates](images/admin-templates.PNG)
 
 Every time that a post or page is created, or every time that a new template is added into the `src/templates/` folder,
-it will appear as an options inside the select elements.
+it will appear as an option inside the select elements.
 
 ### State
 
-This theme uses the [Google's UniFlow](https://google.github.io/uniflow-polymer/) element to work with inner state of
+This theme uses the [Google's UniFlow](https://google.github.io/uniflow-polymer/) element to work with the inner state of
 the application. There are two kind of values inside the application state, those required by the application itself
 and those required by the user.
 
 Every element that implements the `UniFlow.StateAware`, will be notified every time that the state changes.
 
-If the user needs a value set a value, it can be add in this section. Those values will be available inside the custom
+If the user needs to set a value, it can be add in this section. Those values will be available inside the custom
 attribute of the application's state.
 
 
@@ -143,7 +147,7 @@ To do this, the shell fetch the information that Wordpress has for this url usin
 [polymer-theme-route](http://wp.trofrigo.me/elements/polymer-theme-route). This information is eventually passed to the template,
 that is the info that is typically into the [Wordpress's Loop](https://codex.wordpress.org/The_Loop).
 
-Once the template is selected, the shell call to an `init` method that the must implement that receives a param with the Loop's info.
+Once the template is selected, the shell call to an `init(item)` method that the template must implement. That method receives a param with the Loop's info.
 At this point, the shell waits to the template to fire a method called `ready`, that notifies that template is ready to be shown.
 
 In a simple example, a template receives the Loop info, bind it, and notifies that is ready to go.
@@ -170,19 +174,19 @@ to fetch this children information in order to be ready.
         }
     });
 
-Note in this last example, the templates uses the [polymer-theme-wp-api](http://wp.trofrigo.me/elements/polymer-theme-wp-api)
+NOTE: in this last example, the templates uses the [polymer-theme-wp-api](http://wp.trofrigo.me/elements/polymer-theme-wp-api)
 to fetch this information.
 
 ### Template hierarchy
 This theme tries to mimic the Wordpress template behaviour. Every time the route changes, theme's router will find
-what the `taxonomy` and the `slug` of the next view is. Once those params are determinated, the shell will try to find a
+what the `taxonomy` and the `slug` of the next view is. Once those params are determined, the shell will try to find a
 template for the view.
 
-First of all will look for [custom rule](#templates) for this slug,
+First of all, will look for [custom rule](#templates) for this slug,
 if this rule does not exist, will resolve into `templates/template-{taxonomy}-detail.html`.
 
 This hierarchy allows the user to set a default view for a taxonomy detail (typically `post-detail` and `page-detail`)
-and also overwrite it for any special post, just creating a [new rule](#templates).
+and also overwrite it for any special post just creating a [new rule](#templates).
 
 ### [template-blog](https://github.com/trofrigo/polymer-theme/blob/master/src/templates/template-blog.html)
 ### [template-page-detail](https://github.com/trofrigo/polymer-theme/blob/master/src/templates/template-page-detail.html)

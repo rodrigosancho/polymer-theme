@@ -2,14 +2,21 @@
 
 <link rel="import" href="polymer-theme-shared-styles.html">
 
+<!--
+
+polymer-theme-html
+------------------
+
+This element add to the DOM some html information saved as a String.
+
+-->
+
 <dom-module id="polymer-theme-html">
     <template>
         <style include="polymer-theme-shared-styles">
             :host {
                 display: block;
             }
-
-
         </style>
         <!-- DOM Goes Here -->
         <div id="content"></div>
@@ -18,11 +25,17 @@
         Polymer({
             is: 'polymer-theme-html',
             properties: {
+                /** HTML that is going to be shown */
                 html: {
                     type: String,
                     observer: '_htmlChanged'
                 }
             },
+            /**
+             * Updates the DOM every time the `html` changes.
+             * @param html
+             * @private
+             */
             _htmlChanged: function (html) {
                 // WARNING: potential XSS vulnerability if `html` comes from an untrusted source
                 Polymer.dom(this.$.content).innerHTML = html;

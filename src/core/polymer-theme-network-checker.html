@@ -2,6 +2,17 @@
 
 <link rel="import" href="../../bower_components/uniflow-polymer/state-mutator.html">
 
+<!--
+
+polymer-theme-network-checker
+-----------------------------
+
+Every time that hte network status changes, this elements updates a state's path in the application.
+All the elements subscribed to this path implementing the proper [UniFlow](https://github.com/google/uniflow-polymer)
+behavior, will receive the change.
+
+-->
+
 <dom-module id="polymer-theme-network-checker">
     <template>
         <style>

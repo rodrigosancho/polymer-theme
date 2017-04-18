@@ -3,6 +3,16 @@
 
 <link rel="import" href="polymer-theme-wp-api.html">
 
+
+<!--
+polymer-theme-route
+-------------------
+
+This element fetch data about the URL. This data is pretty similar to the
+[Wordpress's Loop](https://codex.wordpress.org/The_Loop) data.
+
+-->
+
 <dom-module id="polymer-theme-route">
     <template>
         <style>
@@ -17,17 +27,21 @@
         Polymer({
             is: 'polymer-theme-route',
             properties : {
-                /** Route object */
+                /** Route object returned by the app-location element */
                 route: Object,
+                /** [wpapi](https://github.com/WP-API/node-wpapi) instance, typically provided by a [polymer-theme-wp-api](http://wp.trofrigo.me/elements/polymer-theme-wp-api) element  */
                 wp: Object,
+                /** Data received by the last call to the service */
                 data: {
                     type: Object,
                     notify: true
                 },
+                /** Tells if the elements is actually requesting the data */
                 loading: {
                     type: Boolean,
                     value: false
                 },
+                /** Tells if the last request failed */
                 failure: {
                     type: Boolean,
                     value: false

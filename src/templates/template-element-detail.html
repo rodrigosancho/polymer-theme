@@ -1,0 +1,56 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/hydrolysis/hydrolysis-analyzer.html">
+<link rel="import" href="../../bower_components/iron-doc-viewer/iron-doc-viewer.html">
+
+<link rel="import" href="../core/polymer-theme-shared-styles.html">
+
+
+<dom-module id="template-element-detail">
+    <template>
+        <style include="polymer-theme-shared-styles">
+            :host {
+                display: block;
+            }
+
+            :host .card {
+                padding: 5%
+            }
+        </style>
+        <hydrolysis-analyzer id="analyzer"
+                             src="[[ path ]]"
+                             analyzer="{{ analyzer }}" on-analyzer-changed="_onAnalyzerChanged">
+        </hydrolysis-analyzer>
+        <div class="card">
+            <iron-doc-viewer descriptor="[[ _descriptor ]]"></iron-doc-viewer>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'template-element-detail',
+            properties: {
+                path: String,
+                _descriptor: Object
+            },
+
+            _onAnalyzerChanged: function (event) {
+                var analyzer = event.detail.value;
+
+                if (analyzer.elements) {
+                    this.set('_descriptor', analyzer.elements[0]);
+                }
+
+                this.fire('move-scroll', {
+                    x: 0,
+                    y: 0
+                });
+                this.fire('ready');
+            },
+
+            init: function (item) {
+                this.path = 'http://wp.localhost/wp-content/themes/polymer-theme/src/core/' + item.title.rendered + '.html'; //TODO
+                this.$.analyzer.analyze();
+            }
+        });
+    </script>
+</dom-module>
