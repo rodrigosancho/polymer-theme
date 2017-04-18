@@ -1,11 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../shared/echo-html.html">
-<link rel="import" href="../shared/shared-styles.html">
+<link rel="import" href="../core/polymer-theme-html.html">
+<link rel="import" href="../core/polymer-theme-shared-styles.html">
 
 <dom-module id="template-page-detail">
     <template>
-        <style include="shared-styles">
+        <style include="polymer-theme-shared-styles">
             :host {
                 display: block;
             }
@@ -20,7 +20,7 @@
             </template>
             <div class="content">
                 <h1>[[ item.title.rendered ]]</h1>
-                <echo-html html="[[ item.content.rendered ]]"></echo-html>
+                <polymer-theme-html html="[[ item.content.rendered ]]"></polymer-theme-html>
             </div>
         </div>
 
@@ -29,21 +29,8 @@
         Polymer({
             is: 'template-page-detail',
 
-            properties: {
-                loading: {
-                    type: Boolean,
-                    reflectToAttribute: true
-                },
-                page: {
-                    type: Object,
-                    value: {}
-                }
-            },
-
             init: function (item) {
-
                 this.set('item', item);
-
                 this.fire('move-scroll', {
                     x: 0,
                     y: 0

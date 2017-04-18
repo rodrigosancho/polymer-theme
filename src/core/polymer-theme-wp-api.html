@@ -1,0 +1,104 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/uniflow-polymer/state-aware.html">
+
+
+<!--
+polymer-theme-wp-api
+--------------------
+
+This element create and share a singletone instance of the [wpapi](https://github.com/WP-API/node-wpapi) library.
+In order to use this library, this element must be instanced in a template and bind it to a template's variable.
+
+ ```html
+    <dom-module id="template-example">
+        <template>
+            <polymer-theme-wp-api wp="{{ wp }}"></polymer-theme-wp-api>
+
+            <div class="container">
+            <template is="dom-repeat"
+                      items="[[ children ]]"
+                      as="link">
+                <div class="card">
+                    <a href$="[[ child.link ]]">
+                        <div class="content">
+                            <h2>[[ child.title.rendered ]]</h2>
+                            <polymer-theme-html html="{{ child.excerpt.rendered }}"></polymer-theme-html>
+                        </div>
+                    </a>
+                </div>
+            </template>
+        </div>
+
+        </template>
+        <script>
+            Polymer({
+                is: 'template-example',
+
+                init: function (item) {
+                    this.wp.pages().param('parent', item.id)
+                        .then(function (items) {
+                            this.set('children', items);
+                            this.fire('ready');
+                        }.bind(this));
+                }
+            });
+        </script>
+    </dom-module>
+```
+
+NOTE: The previous example uses the wp api to find all the pages whose father is the one in the Loop
+
+This element implements as well, a custom endpoint included in this polymer-theme, called `polymer-theme/v1/search`.
+This endpoint is a wrapper of the Wordpress's core function, [WP_Query](https://codex.wordpress.org/Class_Reference/WP_Query)
+
+-->
+
+<dom-module id="polymer-theme-wp-api">
+    <template>
+        <style>
+            :host{
+                display: none;
+            }
+        </style>
+    </template>
+
+    <script src="../../vendor/wpapi/wpapi.min.js"></script>
+
+    <script>
+        (function(){
+
+            var wp;
+
+            Polymer({
+                is: 'polymer-theme-wp-api',
+
+                properties: {
+                    /** Wordpress api library */
+                    wp : {
+                        type: Object,
+                        notify: true
+                    }
+                },
+
+                behaviors: [
+                    UniFlow.StateAware
+                ],
+
+                observers: [
+                    'init(state)'
+                ],
+
+                init: function(state) {
+
+                    wp = wp || new WPAPI({
+                        endpoint: state.siteurl + '/wp-json/'
+                    });
+
+                    wp.search = wp.search || wp.registerRoute('polymer-theme/v1', '/search');
+
+                    this.set('wp', wp);
+                }
+            });
+        })();
+    </script>
+</dom-module>

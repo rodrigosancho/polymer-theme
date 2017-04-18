@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 
+<link rel="import" href="wp-file-selector.html">
 
 <dom-module id="polymer-theme-admin-settings">
     <template>
@@ -10,22 +11,47 @@
             :host {
                 display: block;
             }
+
+            :host .app-icons{
+                display: block;
+                overflow: auto;
+            }
+            :host wp-file-selector{
+                display: inline-block;
+                float: left;
+                margin: 10px;
+            }
         </style>
 
         <h2>General Settings</h2>
         <form id="form"
               is="iron-form"
               class="general-form">
-            <paper-input label="Favicon"
-                         value="{{ options.favicon }}">
-            </paper-input>
-            <paper-input label="Base url"
-                         value="{{ options.baseUrl }}">
-            </paper-input>
+
+            <div class="app-icons">
+                <wp-file-selector label="Favicon"
+                                  file-id="{{ options.favicon }}">
+                </wp-file-selector>
+                <wp-file-selector label="Icon 48x48"
+                                  file-id="{{ options.icon48 }}">
+                </wp-file-selector>
+                <wp-file-selector label="Icon 72x72"
+                                  file-id="{{ options.icon72 }}">
+                </wp-file-selector>
+                <wp-file-selector label="Icon 96x96"
+                                  file-id="{{ options.icon96 }}">
+                </wp-file-selector>
+                <wp-file-selector label="Icon 144x144"
+                                  file-id="{{ options.icon144 }}">
+                </wp-file-selector>
+                <wp-file-selector label="Icon 192x192"
+                                  file-id="{{ options.icon192 }}">
+                </wp-file-selector>
+            </div>
             <paper-input label="Theme color"
                          value="{{ options.themeColor }}">
             </paper-input>
-            <paper-input label="Analytics code"
+            <paper-input label="Google Tag Manager code"
                          value="{{ options.analytics }}">
             </paper-input>
         </form>
@@ -34,8 +60,8 @@
         Polymer({
             is: 'polymer-theme-admin-settings',
             properties: {
-                options: Object
-            }
+                options: Object,
+            },
         })
     </script>
 </dom-module>

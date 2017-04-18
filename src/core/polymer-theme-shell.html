@@ -10,11 +10,86 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/app-layout/app-scrollpos-control/app-scrollpos-control.html">
-<link rel="import" href="../../bower_components/global-variable/global-variable.html">
+<link rel="import" href="../../bower_components/uniflow-polymer/application-state.html">
 
-<link rel="import" href="../shared/polymer-theme-icons.html">
+<link rel="import" href="polymer-theme-icons.html">
+<link rel="import" href="polymer-theme-route.html">
+<link rel="import" href="polymer-theme-network-checker.html">
 
-<link rel="import" href="polymer-theme-router.html">
+
+<!--
+
+polymer-theme-shell
+-------------------
+
+This element it's the minimal amount of HTML, CSS and Javascript needed to show a
+first representation of the application.
+
+It has the ability to infer the proper template depending on the URL.
+The shell fetch the information that Wordpress has for this url using the [polymer-theme-route](http://wp.trofrigo.me/elements/polymer-theme-route).
+This information is eventually passed to the template,
+that is the info that is typically into the [Wordpress's Loop](https://codex.wordpress.org/The_Loop).
+
+Once the template is selected, the shell call to an `init(item)` method that the template must implement. That method receives a param with the Loop's info.
+At this point, the shell waits to the template to fire a method called `ready`, that notifies that template is ready to be shown.
+
+In a simple example, a template receives the Loop info, bind it, and notifies that is ready to go.
+
+ ```javascript
+    Polymer({
+        is: 'post-detail',
+        init: function (item) {
+            this.set('item', item);
+            this.fire('ready');
+        }
+    });
+ ```
+
+In a more complex example, a template that renders a page may need to find all page's children. In this case the template needs
+to fetch this children information in order to be ready.
+
+ ```javascript
+    Polymer({
+        is: 'page-children',
+        init: function (item) {
+            this.wp.pages().param('parent', item.id)
+                .then(function (response) {
+                    this.set('children', response);
+                    this.fire('ready');
+                }.bind(this));
+        }
+    });
+ ```
+
+NOTE: in this last example, the templates uses the [polymer-theme-wp-api](http://wp.trofrigo.me/elements/polymer-theme-wp-api)
+to fetch this information.
+
+Apart from this template resolution, this shell is able to handle some events by any inner element. Those events are:
+
+`update-head`
+-------------
+ Firing this event, any inner element is able to update the tile and any `meta` tag inside the application's head.
+Example fired by an inner element:
+  ```javascript
+    this.fire('update-head', {
+        'title': 'Title',
+        'descriptions': 'Description text',
+        'theme-color': '#fff'
+    });
+   ```
+
+`move-scroll`
+-------------
+Firing this event, any inner element is to move the application scroll to given coordinate.
+Example fired by an inner element:
+  ```javascript
+    this.fire('move-scroll', {
+        x: 0,
+        y: 0
+    });
+   ```
+
+-->
 
 <dom-module id="polymer-theme-shell">
     <template>
@@ -74,24 +149,18 @@
             }
         </style>
 
-        <!-- Application Variables -->
-        <global-variable key="offline" value="{{ offline }}"></global-variable>
-        <global-variable key="siteTitle" value="{{ siteTitle }}"></global-variable>
-        <global-variable key="frontPage" value="{{ frontPage }}"></global-variable>
-        <global-variable key="taxonomy" value="{{ taxonomy }}"></global-variable>
-        <global-variable key="slug" value="{{ slug }}"></global-variable>
-        <global-variable key="alias" value="{{ alias }}"></global-variable>
-
-        <app-location route="{{route}}"></app-location>
-        <polymer-theme-router route="[[ route ]]"
-                              on-found-next="_changePage"></polymer-theme-router>
-
+        <!-- Network checker -->
+        <polymer-theme-network-checker></polymer-theme-network-checker>
+        <!-- App router -->
+        <app-location route="{{ route }}"></app-location>
+        <polymer-theme-route route="{{ route }}"
+                             data="{{ data }}"></polymer-theme-route>
         <app-drawer-layout id="drawerLayout" fullbleed>
             <!-- Drawer content -->
             <app-drawer id="drawer"
                         opened="{{ _menuOpened }}">
                 <app-toolbar>Menu</app-toolbar>
-                <iron-selector selected="[[page]]"
+                <iron-selector selected="[[ page ]]"
                                attr-for-selected="name"
                                class="drawer-list"
                                role="navigation">
@@ -103,7 +172,6 @@
 
             <!-- Main content -->
             <app-header-layout>
-
                 <app-header id="header"
                             condenses
                             reveals
@@ -132,29 +200,37 @@
     <script>
         Polymer({
             is: 'polymer-theme-shell',
-
             properties: {
+                /** Current route taxonomy */
                 taxonomy: {
                     type: String,
                     reflectToAttribute: true
                 },
+                /** Current route slug */
                 slug: {
                     type: String,
                     reflectToAttribute: true
                 },
+                /** Current route template */
                 template: {
                     type: String,
                     reflectToAttribute: true
                 },
+                /** All the menus set in the Wordpress's backoffice */
                 menus: Object,
                 menu: {
                     type: Function,
                     computed: '_getMenu(menus)'
                 },
-
+                /** List of templates custom rules set in the Wordpress's backoffice */
                 templates: Object,
-
-                state: Object
+                /** Current route */
+                route: Object,
+                /** Data for the current element, similar to Wordpress's Loop data */
+                data: {
+                    type: Object,
+                    observer: '_changePage'
+                }
             },
 
             listeners: {
@@ -162,29 +238,18 @@
                 'move-scroll': '_onMoveScroll'
             },
 
+            behaviors: [
+                UniFlow.ApplicationState
+            ],
+
             created: function () {
-                window.performance && performance.mark && performance.mark('polymer-theme.created');
                 // Custom elements polyfill safe way to indicate an element has been upgraded.
                 this.removeAttribute('unresolved');
             },
 
-            ready: function () {
-                // listen for online/offline
-                Polymer.RenderStatus.afterNextRender(this, function () {
-                    this.listen(window, 'online', '_updateNetworkStatus');
-                    this.listen(window, 'offline', '_updateNetworkStatus');
-                });
-            },
-
-            _updateNetworkStatus: function () {
-                this.offline = !navigator.onLine;
-            },
-
-            _changePage: function (event) {
-
-                this.taxonomy = event.detail.item.type;
-                this.slug = event.detail.item.slug;
-
+            _changePage: function (data) {
+                this.taxonomy = data.type;
+                this.slug = data.slug;
                 // Load page import on demand. Show 404 page if fails
                 var templateFile = (this.templates[this.slug])
                                 ? this.templates[this.slug]
@@ -193,13 +258,13 @@
 
                 this.importHref(templateFileUrl,
                         function () {
-                            this._setView(templateFile.replace('.html', ''), event.detail.item);
+                            this._setView(templateFile.replace('.html', ''), data);
                         },
                         this._showPage404, true);
             },
 
             _setView: function (template, item) {
-                var _onReady = function () {
+                var _onReady = function (event) {
                     //Updating head
                     if (item) {
                         this.fire('update-head', item.tags);
@@ -212,7 +277,6 @@
 
                 var view = this.$.pages.querySelector(template);
                 //Adding template if necessary
-
 
                 if (!view) {
                     view = document.createElement(template);
@@ -245,13 +309,7 @@
             },
 
             _showPage404: function () {
-                var templateFile = 'template-404.html',
-                        templateFileUrl = this.resolveUrl('../templates/' + templateFile);
-                this.importHref(templateFileUrl,
-                        function () {
-                            this._setView(templateFile.replace('.html', ''));
-                        },
-                        null, true);
+                location.href = this.state.siteurl + '/404';
             },
 
             _closeMenu: function () {
@@ -267,4 +325,7 @@
             }
         });
     </script>
+
 </dom-module>
+
+

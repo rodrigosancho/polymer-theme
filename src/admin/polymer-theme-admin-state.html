@@ -2,12 +2,12 @@
 
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/paper-select/paper-select.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="../core/polymer-theme-icons.html">
 
-<dom-module id="polymer-theme-admin-templates">
+
+<dom-module id="polymer-theme-admin-state">
     <template>
         <style>
             :host {
@@ -16,7 +16,7 @@
                 display: block;
             }
 
-            :host .add-row paper-select {
+            :host .add-row paper-input {
                 width: 43%;
                 display: inline-block;
                 float: left;
@@ -49,120 +49,109 @@
             }
         </style>
 
-        <h2>Templates</h2>
+        <h2>Application state paths</h2>
+        <div>
+            <paper-input label="Site url *"
+                         value="{{ options.siteurl }}"
+                         required
+                         error-message="You must complete this field"></paper-input>
+        </div>
+        <h2>Custom state paths</h2>
         <div class="add-row">
             <form id="form"
                   is="iron-form">
-                <paper-select label="Post"
-                              language="[[ language ]]"
-                              selected="{{ _post }}"
-                              options="[[ posts ]]"
-                              option-value-attr="slug"
-                              option-label-attr="title"
-                              required
-                              error-message="You must select a post"
-                              search>
-                </paper-select>
-                <paper-select label="Template"
-                              language="[[ language ]]"
-                              selected="{{ _template_file }}"
-                              options="[[ templates ]]"
-                              required
-                              error-message="You must select a template"
-                              search>
-                </paper-select>
-                <paper-icon-button icon="add" on-click="_addTemplate"></paper-icon-button>
+                <paper-input label="Path"
+                             value="{{ _path }}"
+                             required
+                             error-message="You must complete this field"></paper-input>
+                <paper-input label="Value"
+                             value="{{ _value }}"
+                             required
+                             error-message="You must complete this field"></paper-input>
+                <paper-icon-button icon="add" on-click="_add"></paper-icon-button>
             </form>
         </div>
         <table class="table">
             <thead>
             <tr>
-                <th>Slug</th>
-                <th>Template</th>
+                <th>Path</th>
+                <th>Value</th>
                 <th>Actions</th>
             </tr>
             </thead>
             <tbody>
             <template is="dom-repeat"
-                      items="[[ _slugs ]]"
-                      as="slug">
+                      items="[[ _paths ]]"
+                      as="path">
                 <tr>
-                    <td>[[ slug ]]</td>
-                    <td>[[ _getValue(slug, options) ]]</td>
+                    <td>[[ path ]]</td>
+                    <td>[[ _getValue(path, options.custom) ]]</td>
                     <td>
                         <paper-icon-button icon="delete"
-                                           on-click="_deleteTemplate">
+                                           on-click="_delete">
                         </paper-icon-button>
                     </td>
                 </tr>
             </template>
             </tbody>
         </table>
-
-
     </template>
     <script>
         Polymer({
-            is: 'polymer-theme-admin-templates',
+            is: 'polymer-theme-admin-state',
             properties: {
                 /** Templates config object */
                 options: Object,
-                /** List of all posts */
-                posts: Array,
-                /** List of templates */
-                templates: Array,
-
-                _template_file: {
+                _path: {
                     type: String,
                     value: ""
                 },
-                _post: {
+                _value: {
                     type: String,
                     value: ""
                 },
-                _slugs: {
+                _paths: {
                     type: Array,
-                    computed : '_getKeys(options.*)'
+                    computed: '_getKeys(options.custom.*)'
                 }
             },
 
-            _addTemplate: function (event) {
-                if(!this.$.form.validate()) return;
+            _add: function () {
+                if (!this.$.form.validate()) return;
 
                 //Checking if there is not repeated
-                if (typeof this.options[this._post] === 'undefined') {
-                    this.set('options.' + this._post, this._template_file);
+                if (typeof this.options.custom[this._path] === 'undefined') {
+                    this.set('options.custom.' + this._path, this._value);
                     //Resetting selects
-                    this._post = null;
-                    this._template_file = null;
+                    this._value = null;
+                    this._path = null;
                 } else {
                     this.fire('notify', {
-                        message: "There's already a template for this post"
+                        message: "There's already a value for this path"
                     });
                 }
             },
 
-            _deleteTemplate: function (event) {
-                var slug = event.model.slug,
+            _delete: function (event) {
+                var path = event.model.path,
                     options = {};
 
-                if (typeof this.get('options.' + slug) !== 'undefined') {
-                    for(var property in this.options){
-                        if(this.options.hasOwnProperty(property) && property != slug){
-                            options[property] = this.options[property];
+                if (typeof this.get('options.custom.' + path) !== 'undefined') {
+                    for (var property in this.options.custom) {
+                        if (this.options.custom.hasOwnProperty(property) && property != path) {
+                            options[property] = this.options.custom[property];
                         }
                     }
 
-                    this.set('options', options);
+                    this.set('options.custom', options);
                 }
             },
 
             _getKeys: function (object) {
-                return Object.keys(object.base);
+                return (object.base) ? Object.keys(object.base) : [];
             },
 
             _getValue: function (key, object) {
-
                 return object[key];
             }
         })

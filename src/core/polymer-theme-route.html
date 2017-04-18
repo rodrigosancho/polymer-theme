@@ -1,0 +1,78 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/uniflow-polymer/state-aware.html">
+
+<link rel="import" href="polymer-theme-wp-api.html">
+
+
+<!--
+polymer-theme-route
+-------------------
+
+This element fetch data about the URL. This data is pretty similar to the
+[Wordpress's Loop](https://codex.wordpress.org/The_Loop) data.
+
+-->
+
+<dom-module id="polymer-theme-route">
+    <template>
+        <style>
+            :host{
+                display: none;
+            }
+        </style>
+        <!-- WP Api -->
+        <polymer-theme-wp-api wp="{{ wp }}"></polymer-theme-wp-api>
+    </template>
+    <script>
+        Polymer({
+            is: 'polymer-theme-route',
+            properties : {
+                /** Route object returned by the app-location element */
+                route: Object,
+                /** [wpapi](https://github.com/WP-API/node-wpapi) instance, typically provided by a [polymer-theme-wp-api](http://wp.trofrigo.me/elements/polymer-theme-wp-api) element  */
+                wp: Object,
+                /** Data received by the last call to the service */
+                data: {
+                    type: Object,
+                    notify: true
+                },
+                /** Tells if the elements is actually requesting the data */
+                loading: {
+                    type: Boolean,
+                    value: false
+                },
+                /** Tells if the last request failed */
+                failure: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+
+            observers: [
+                '_onRouteChanged(route, wp, state)'
+            ],
+
+            behaviors: [
+                UniFlow.StateAware
+            ],
+
+            _onRouteChanged: function(route, wp, state){
+
+                var url = state.siteurl + route.path;
+
+                this.set('loading', true);
+
+                wp.search().param('url', url)
+                    .then(function(items){
+                        this.set('data', items[0]);
+                        this.set('failure', false);
+                        this.set('loading', false);
+                    }.bind(this))
+                    .catch(function(){
+                        this.set('failure', true);
+                        this.set('loading', false);
+                    }.bind(this));
+            },
+        });
+    </script>
+</dom-module>

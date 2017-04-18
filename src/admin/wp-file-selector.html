@@ -1,0 +1,177 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../core/polymer-theme-icons.html">
+
+<dom-module id="wp-file-selector">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+
+            :host label, :host span {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                -webkit-font-smoothing: antialiased;
+                font-size: 12px;
+                font-weight: 400;
+                line-height: 24px;
+                color: #737373;
+                width: 100%;
+            }
+
+            :host label{
+                @apply(--wp-file-selector-label);
+            }
+
+            :host span {
+                margin: 0 5px;
+                text-align: center;
+                line-height: 15px;
+                @apply(--wp-file-selector-message);
+            }
+
+            :host div#preview {
+                border: 2px dotted #737373;
+                border-radius: 50%;
+                background-image: var(--wp-file-selector-url);
+                background-color: #eee;
+                background-position: center;
+                background-size: cover;
+                overflow: hidden;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                height: var(--wp-file-selector-preview-height, 100px);
+                width: var(--wp-file-selector-preview-width, 100px);
+                @apply(--wp-file-selector-preview);
+            }
+
+            :host iron-icon {
+                height: 100%;
+                width: 100%;
+                opacity: 0.5;
+            }
+        </style>
+
+        <label for="attachment">[[ label ]]
+            <input type="hidden"
+                   id="attachment"
+                   value$="{{ value }}">
+        </label>
+        <div id="preview">
+            <template is="dom-if"
+                      if="{{ _showIf(_status, 'empty') }}">
+                <span>Choose an image</span>
+            </template>
+            <template is="dom-if"
+                      if="{{ _showIf(_status, 'loading') }}">
+                <iron-icon icon="loader"></iron-icon>
+            </template>
+        </div>
+    </template>
+    <script>
+
+        Polymer({
+            is: 'wp-file-selector',
+            properties: {
+                fileId: {
+                    type: String,
+                    notify: true,
+                    reflectToAttribute: true
+                }
+            },
+            listeners: {
+                'tap': 'openModal'
+            },
+            observers: [
+                '_updatePreview(attachment.url)',
+                '_updateId(attachment.id)'
+            ],
+
+
+            attached: function () {
+                this._status = "loading";
+                this._checkIfWpIsLoaded(1);
+            },
+
+            _checkIfWpIsLoaded: function(times){
+                if(typeof wp != 'undefined'){
+                    this.init(wp);
+                }else if(times < 50){
+                    setTimeout(function(){
+                        this._checkIfWpIsLoaded(times++);
+                    }.bind(this), 100);
+                }
+            },
+
+            init: function (wp) {
+                if (typeof this.fileId != 'undefined' && typeof this.attachment == 'undefined') {
+                    //Fetch attachment information
+                    var attachment = wp.media.attachment(this.fileId);
+                    attachment.fetch()
+                            .then(function () {
+                                if (attachment) {
+                                    this.attachment = attachment.attributes;
+                                    this._status = "loaded";
+                                } else {
+                                    this._status = "empty";
+                                }
+                            }.bind(this));
+                } else if (typeof this.fileId == 'undefined' && typeof this.attachment == 'undefined') {
+                    this._status = "empty"
+                } else {
+                    this._status = "loaded";
+                }
+            },
+
+            openModal: function (event) {
+                event.preventDefault();
+                // If the media frame already exists, reopen it.
+                if (this.file_frame) {
+                    // Open frame
+                    this.file_frame.open();
+                    return;
+                }
+                // Create the media frame.
+                this.file_frame = wp.media.frames.file_frame = wp.media({
+                    title: this.label,
+                    button: {
+                        text: 'Use this image'
+                    },
+                    multiple: false	// Set to true to allow multiple files to be selected
+                });
+                //Selecting the current attachment
+                this.file_frame.on('open', function () {
+                    var selection = this.file_frame.state().get('selection'),
+                            attachment = wp.media.attachment(this.fileId);
+
+                    attachment.fetch();
+                    selection.add(attachment);
+                }.bind(this));
+                // When an image is selected, run a callback.
+                this.file_frame.on('select', function () {
+                    // We set multiple to false so only get one image from the uploader
+                    this.set('attachment', this.file_frame.state().get('selection').first().toJSON());
+                    this._status = "loaded";
+                }.bind(this));
+                // Finally, open the modal
+                this.file_frame.open();
+            },
+
+            _updatePreview: function (url) {
+                this.customStyle['--wp-file-selector-url'] = 'url("' + url + '")';
+                this.updateStyles();
+            },
+
+            _updateId: function (id) {
+                if (id != this.get('fileId'))
+                    this.set('fileId', id);
+            },
+
+            _showIf: function (currentStatus, desiredStatus) {
+                return currentStatus === desiredStatus;
+            }
+        });
+    </script>
+</dom-module>
